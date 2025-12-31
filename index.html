@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,10 +10,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="app-container">
         <header class="header">
-            <h1>Weekly Focus</h1>
+            <div class="header-left">
+                <h1>Weekly Planner</h1>
+                <button id="add-event-btn" class="add-btn" title="Add Event">+</button>
+            </div>
             <div class="controls">
                 <span class="time-format-label">24h</span>
                 <label class="switch">
@@ -45,7 +50,7 @@
                     <label for="event-title">Title</label>
                     <input type="text" id="event-title" placeholder="Meeting, Workout..." autocapitalize="words">
                 </div>
-                
+
                 <div class="form-row">
                     <div class="form-group">
                         <label for="event-day">Day</label>
@@ -90,4 +95,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>

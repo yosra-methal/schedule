@@ -12,7 +12,7 @@ const CONFIG = {
     ]
 };
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 // State
 let state = {
@@ -39,7 +39,8 @@ const elements = {
         save: document.getElementById('save-btn'),
         cancel: document.getElementById('cancel-btn'),
         delete: document.getElementById('delete-btn'),
-        close: document.getElementById('close-modal')
+        close: document.getElementById('close-modal'),
+        add: document.getElementById('add-event-btn')
     },
     toggle: document.getElementById('time-format-toggle')
 };
@@ -54,7 +55,7 @@ function init() {
     calculateViewRange();
     renderGrid();
     setupEventListeners();
-    
+
     // Set toggle state
     elements.toggle.checked = !state.use24h;
 }
@@ -104,11 +105,11 @@ function renderGrid() {
     // If viewStart is 8, first label is 08:00 at top (0px).
     // Last label is viewEnd.
     const totalHours = state.viewEnd - state.viewStart;
-    
+
     // Create header spacer for time column?
     // The design has days header. We need to match that.
     // Actually, checking styles again: .time-column has padding-top: 40px to match header.
-    
+
     for (let h = state.viewStart; h <= state.viewEnd; h++) {
         const timeDiv = document.createElement('div');
         timeDiv.className = 'time-slot';
@@ -120,7 +121,7 @@ function renderGrid() {
     DAYS.forEach((dayName, dayIndex) => {
         const col = document.createElement('div');
         col.className = 'day-column';
-        
+
         // Header
         const header = document.createElement('div');
         header.className = 'day-header';
@@ -132,7 +133,7 @@ function renderGrid() {
         body.className = 'day-body';
         body.style.height = (totalHours * CONFIG.slotHeight) + 'px';
         body.dataset.dayIndex = dayIndex;
-        
+
         // Click to add
         body.addEventListener('click', (e) => handleGridClick(e, dayIndex));
 
@@ -151,18 +152,18 @@ function renderGrid() {
 function createEventElement(ev) {
     const el = document.createElement('div');
     el.className = `event-card ${ev.color}`;
-    
+
     const startH = getDecimalHour(ev.start);
     const endH = getDecimalHour(ev.end);
     const duration = endH - startH;
-    
+
     // Top relative to viewStart
     const top = (startH - state.viewStart) * CONFIG.slotHeight;
     const height = duration * CONFIG.slotHeight;
 
     el.style.top = `${top}px`;
     el.style.height = `${height}px`;
-    
+
     // Content
     el.innerHTML = `
         <strong>${ev.title || 'Untitled'}</strong>
@@ -190,7 +191,7 @@ function formatTimeDisplay(hour) {
     const h = Math.floor(hour);
     const m = Math.round((hour - h) * 60);
     const mStr = m < 10 ? '0' + m : m;
-    
+
     if (state.use24h) {
         return `${h}:${mStr}`;
     } else {
@@ -217,13 +218,13 @@ function renderColorOptions() {
         // But for selection circle, we can just use inline styles
         d.dataset.id = c.id;
         if (c.id === selectedColor) d.classList.add('selected');
-        
+
         d.addEventListener('click', () => {
-             document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
-             d.classList.add('selected');
-             selectedColor = c.id;
+            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('selected'));
+            d.classList.add('selected');
+            selectedColor = c.id;
         });
-        
+
         elements.form.colorContainer.appendChild(d);
     });
 }
@@ -252,7 +253,7 @@ function openModal(existingEvent = null) {
         selectedColor = CONFIG.colors[0].id;
         elements.btns.delete.classList.add('hidden');
     }
-    
+
     // Update color selection UI
     document.querySelectorAll('.color-option').forEach(el => {
         el.classList.toggle('selected', el.dataset.id === selectedColor);
@@ -266,36 +267,37 @@ function closeModal() {
 }
 
 function handleGridClick(e, dayIndex) {
-    if (e.target.classList.contains('event-card')) return; 
-    
+    if (e.target.classList.contains('event-card')) return;
+
     // Calculate clicked time
     const rect = e.currentTarget.getBoundingClientRect();
     const offsetY = e.clientY - rect.top; // pixels from top of day-body
     const clickedH = state.viewStart + (offsetY / CONFIG.slotHeight);
-    
+
     // Round to nearest 30 mins
     const h = Math.floor(clickedH);
     const m = Math.floor((clickedH - h) * 60);
-    
+
     // Round m to 0 or 30
     const mRounded = m < 30 ? 0 : 30;
-    
+
     const startStr = `${h.toString().padStart(2, '0')}:${mRounded.toString().padStart(2, '0')}`;
     // End logic: +1 hour
     const endH = h + 1;
     const endStr = `${endH.toString().padStart(2, '0')}:${mRounded.toString().padStart(2, '0')}`;
-    
+
     elements.form.day.value = dayIndex;
     elements.form.start.value = startStr;
     elements.form.end.value = endStr;
-    
+
     openModal();
 }
 
 function setupEventListeners() {
     elements.btns.cancel.addEventListener('click', closeModal);
     elements.btns.close.addEventListener('click', closeModal);
-    
+    elements.btns.add.addEventListener('click', () => openModal());
+
     elements.btns.save.addEventListener('click', () => {
         const title = elements.form.title.value;
         const day = parseInt(elements.form.day.value);
@@ -303,8 +305,8 @@ function setupEventListeners() {
         const end = elements.form.end.value;
         const color = selectedColor;
 
-        if(!start || !end) return alert('Time is required');
-        
+        if (!start || !end) return alert('Time is required');
+
         // Validation: End > Start
         if (getDecimalHour(end) <= getDecimalHour(start)) {
             return alert('End time must be after start time');
@@ -324,7 +326,7 @@ function setupEventListeners() {
             };
             state.events.push(newEvent);
         }
-        
+
         saveData();
         closeModal();
     });

@@ -1,8 +1,10 @@
 :root {
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --text-color: #333333;
+    --text-muted: #666666;
     --grid-line: #F0F0F0;
     --card-bg: #FFFFFF;
+    --header-bg: #F9F9F9;
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     --radius-card: 24px;
@@ -36,15 +38,12 @@ body {
     font-family: var(--font-family);
     color: var(--text-color);
     background-color: transparent;
-    /* For Notion embed blending if needed, but container is white */
     padding: 20px;
     height: 100vh;
     display: flex;
     justify-content: center;
     align-items: flex-start;
-    /* Allow scrolling if long */
     overflow: hidden;
-    /* Main scroll handled inside widget if needed, or body scroll */
 }
 
 /* Scrollbar styling */
@@ -70,7 +69,8 @@ body {
     background: var(--card-bg);
     border-radius: var(--radius-card);
     width: 100%;
-    max-width: 1200px;
+    max-width: 100%;
+    /* Flexible full width */
     height: 100%;
     max-height: 100%;
     display: flex;
@@ -88,15 +88,43 @@ body {
     align-items: center;
     border-bottom: 1px solid var(--grid-line);
     flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
+    background: var(--card-bg);
     z-index: 10;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .header h1 {
     font-size: 20px;
-    font-weight: 600;
-    color: #111;
+    font-weight: 500;
+    color: var(--text-muted);
+    /* Subtle grey title */
+}
+
+.add-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #eee;
+    background: #fff;
+    color: #666;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.add-btn:hover {
+    background: #f5f5f5;
+    color: #333;
+    border-color: #ddd;
 }
 
 .controls {
@@ -105,7 +133,7 @@ body {
     gap: 8px;
     font-size: 13px;
     font-weight: 500;
-    color: #666;
+    color: #888;
 }
 
 /* Switch */
@@ -129,7 +157,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: #eee;
     transition: .4s;
     border-radius: 20px;
 }
@@ -144,6 +172,7 @@ body {
     background-color: white;
     transition: .4s;
     border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 input:checked+.slider {
@@ -158,18 +187,102 @@ input:checked+.slider:before {
 .planner-wrapper {
     display: flex;
     flex: 1;
-    overflow-y: auto;
+    overflow: hidden;
+    /* Scroll handled internally */
     position: relative;
-    scroll-behavior: smooth;
 }
 
 .time-column {
     width: 60px;
     flex-shrink: 0;
     border-right: 1px solid var(--grid-line);
-    background: #fff;
+    background: var(--header-bg);
+    /* Distinct background */
     padding-top: 40px;
-    /* Header height offset */
+    /* Header offset */
+    overflow-y: hidden;
+    /* Syncs with grid scroll via JS if needed, but easier if shared container. 
+                           Actually, we want better scrolling. Let's make wrapper scrollable.
+                           If wrapper is scrollable, time column and headers need to be sticky. */
+}
+
+/* 
+   Better approach for scroll: 
+   Wrapper has overflow: auto.
+   Time column is sticky left.
+   Header is sticky top.
+   Corner is sticky top-left.
+*/
+
+.planner-wrapper {
+    overflow: auto;
+    /* Enable scrollbars */
+    /* Custom scrollbar for planner area */
+}
+
+/* Corner piece (top-left) */
+.planner-wrapper::before {
+    content: '';
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 40px;
+    z-index: 20;
+    background: var(--header-bg);
+    border-bottom: 1px solid var(--grid-line);
+    border-right: 1px solid var(--grid-line);
+    display: block;
+    float: left;
+    /* To sit in flow? No, this is tricky in flex/grid mixes. */
+}
+
+/* Re-structuring for sticky headers/cols requires a Grid Container usually. */
+/* Let's stick to the current flex structure but make sure it handles overflow nicely. */
+
+/* REVISED STRUCTURE IN CSS */
+.planner-wrapper {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    grid-template-rows: 40px 1fr;
+    overflow: auto;
+    flex: 1;
+}
+
+/* Corner */
+.grid-corner {
+    /* Virtual element if not in HTML, but we have structure: time-column and days-grid. */
+    /* This current HTML structure is:
+       planner-wrapper -> [time-column] [days-grid]
+       time-column contains time-slots.
+       days-grid contains day-columns -> [header] [body]
+       
+       This structure is hard to make fully sticky in both directions easily without restructure.
+       However, we can make planner-wrapper overflow-y: auto.
+       And ensure days-grid is min-width for x-scroll.
+    */
+}
+
+/* Resetting to fit current HTML logic but improved */
+.planner-wrapper {
+    display: flex;
+    flex-direction: row;
+    overflow-y: auto;
+    overflow-x: auto;
+    position: relative;
+    background: #fff;
+}
+
+.time-column {
+    position: sticky;
+    left: 0;
+    z-index: 30;
+    width: 60px;
+    min-width: 60px;
+    background: var(--header-bg);
+    border-right: 1px solid var(--grid-line);
+    padding-top: 40px;
+    /* Offset for header */
 }
 
 .time-slot {
@@ -180,21 +293,24 @@ input:checked+.slider:before {
     padding-right: 12px;
     position: relative;
     top: -6px;
-    /* Align text with line */
 }
 
 .days-grid {
+    display: flex;
+    /* Flex based columns */
+    min-width: 800px;
+    /* Ensure valid width on small screens so scroll appears */
     flex: 1;
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    /* Rows are managed by height */
-    position: relative;
-    min-width: 600px;
 }
 
 .day-column {
-    position: relative;
+    flex: 1;
+    min-width: 100px;
+    /* Ensure readable columns */
     border-right: 1px solid var(--grid-line);
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 .day-column:last-child {
@@ -203,28 +319,52 @@ input:checked+.slider:before {
 
 .day-header {
     height: 40px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 13px;
     font-weight: 600;
-    color: #555;
+    color: var(--text-muted);
+    background: var(--header-bg);
+    /* Distinct BG */
     border-bottom: 1px solid var(--grid-line);
+
     position: sticky;
     top: 0;
-    background: rgba(255, 255, 255, 0.95);
-    z-index: 5;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    z-index: 20;
+    /* Above events, below time col if overlapping, but time col is z-30 */
+    text-transform: capitalize;
+    /* Full names */
 }
 
 .day-body {
     position: relative;
-    /* Height will be set by JS based on hours */
     background-image: linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
     background-size: 100% var(--slot-height);
-    background-position: 0 0;
-    /* Align with top */
+    flex: 1;
+}
+
+/* Fix corner overlap for sticky elements */
+/* The time column is sticky left. The day headers are sticky top. 
+   When scrubbing right, time col stays. 
+   When scrubbing down, headers stay. 
+   The intersection (top-left) needs to be handled.
+   With current HTML, time-column has padding-top 40px. 
+   We need a pseudo element on time-column to act as the "corner header" that is sticky top AND left.
+*/
+
+.time-column::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    /* Header height */
+    background: var(--header-bg);
+    border-bottom: 1px solid #e0e0e0;
+    z-index: 40;
 }
 
 /* Events */
@@ -232,7 +372,8 @@ input:checked+.slider:before {
     position: absolute;
     left: 4px;
     right: 4px;
-    padding: 4px 8px;
+    padding: 2px 8px;
+    /* Slightly reduced padding for tighter fit */
     border-radius: var(--radius-label);
     font-size: 13px;
     font-weight: 600;
@@ -243,12 +384,26 @@ input:checked+.slider:before {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
+    justify-content: center;
+    /* Center Vertically if short */
+}
+
+.event-card strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-card span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .event-card:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 2;
+    z-index: 100;
 }
 
 .event-card.blue {
@@ -292,7 +447,7 @@ input:checked+.slider:before {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 100;
+    z-index: 1000;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
@@ -308,7 +463,7 @@ input:checked+.slider:before {
     background: white;
     padding: 24px;
     border-radius: 20px;
-    width: 360px;
+    width: 380px;
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     transform: scale(0.95);
     transition: transform 0.2s ease;
@@ -328,6 +483,7 @@ input:checked+.slider:before {
 .modal-header h2 {
     font-size: 18px;
     font-weight: 600;
+    color: #333;
 }
 
 .close-btn {
@@ -345,7 +501,8 @@ input:checked+.slider:before {
 .form-group label {
     display: block;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
+    /* Apple style labels often slightly bolder if small */
     color: #777;
     margin-bottom: 6px;
 }
@@ -354,12 +511,13 @@ input:checked+.slider:before {
 .form-group select {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
     font-size: 14px;
-    background: #fafafa;
+    background: #fcfcfc;
     transition: border-color 0.2s;
     font-family: inherit;
+    color: #333;
 }
 
 .form-group input:focus,
@@ -385,17 +543,31 @@ input:checked+.slider:before {
 }
 
 .color-option {
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     cursor: pointer;
     border: 2px solid transparent;
+    /* default border */
+    position: relative;
     transition: transform 0.2s;
 }
 
-.color-option.selected {
-    transform: scale(1.2);
-    box-shadow: 0 0 0 2px #333;
+.color-option::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    transition: border-color 0.2s;
+}
+
+.color-option.selected::after {
+    border-color: #333;
 }
 
 .color-option:hover {
@@ -414,7 +586,7 @@ input:checked+.slider:before {
 }
 
 .btn {
-    padding: 8px 16px;
+    padding: 8px 18px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
@@ -424,8 +596,12 @@ input:checked+.slider:before {
 }
 
 .btn-primary {
-    background: #111;
+    background: #333;
     color: white;
+}
+
+.btn-primary:hover {
+    background: #000;
 }
 
 .btn-primary:active {
@@ -433,13 +609,21 @@ input:checked+.slider:before {
 }
 
 .btn-secondary {
-    background: #f0f0f0;
+    background: #f5f5f5;
     color: #333;
 }
 
+.btn-secondary:hover {
+    background: #e0e0e0;
+}
+
 .btn-danger {
-    background: #ffebee;
+    background: #fff0f0;
     color: #d32f2f;
+}
+
+.btn-danger:hover {
+    background: #ffe0e0;
 }
 
 .hidden {
