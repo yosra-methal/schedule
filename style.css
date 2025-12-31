@@ -228,31 +228,74 @@ input:checked+.slider:before {
     text-align: right;
     padding-right: 12px;
     position: relative;
-    top: -6px;
-    /* Keep slight offset but ensure it doesn't clip. Actually, let's reset to 0 for safety or use translation */
-    transform: translateY(-50%);
-    /* Center on the tick? No, just keep it simple */
+    /* Align logic: grid line is at top. We want label centered on the line usually, or just below. 
+       User requested alignment. Let's put it slightly offset -50% to center on line.
+    */
+    display: flex;
+    align-items: center;
+    /* Vertically center in the slot? No, on keyline */
+    justify-content: flex-end;
     top: 0;
-    /* Updated: align with top of slot to avoid clipping under header */
+    transform: translateY(-50%);
+    /* Move up so center of slot is on the line? No. */
+    /* If height is 60px. Top is 0. 
+       If we want "08:00" to be at the line (which is at top border), we need to shift it up.
+       However shift up clips under sticky header if it is the first one!
+       
+       Solution for First Item:
+       The first item starts at top=40px (under header).
+       If we shift up, it goes under header.
+       
+       Better visual: Text inside the slot, top aligned.
+       "Lining up with vertical lines" -> implies text baseline on the line?
+       Or text vertically centered in the slot?
+       
+       If grid lines are at 0, 60, 120...
+       And text is at 0, 60...
+       Usually text is centered on the tick.
+       
+       To fix clipping:
+       We cannot translate up the first item if it goes under header.
+       We should just align text to top with padding.
+    */
+    align-items: flex-start;
+    padding-top: 0;
+    transform: translateY(-50%);
+    /* This is standard for time axes. But the first one clips. */
+    /* We will keep translateY(-50%) but we need to ensure the container has space?
+       The container 'time-column' has the spacer.
+       Spacer is sticky.
+       
+       If we use transform, the element effectively moves up visually.
+       The first element is at Y=0 relative to non-sticky flow? No, after spacer.
+       So Y=40px.
+       transform -50% of height(60) = -30px.
+       Visual Y = 10px.
+       Spacer takes 0-40px.
+       So 10px is under spacer (0-40). Hidden.
+       
+       FIX: The First Time Slot needs special handling or we shift the whole grid down?
+       Or we just align text to 'flex-start' (top) without negative transform.
+       Text at top of slot = Text just below line.
+       This is perfectly fine and safe.
+    */
+    transform: none;
+    align-items: flex-start;
     padding-top: 4px;
-    /* Slight push down for aesthetics */
+    /* Move slightly down from line */
+    box-sizing: border-box;
     border-bottom: 1px solid transparent;
-    /* Maintain box sizing if needed */
 }
 
 .days-grid {
     display: flex;
     flex: 1;
     min-width: 800px;
-    /* Force horizontal scroll on small screens */
 }
-
-
 
 .day-column {
     flex: 1;
     min-width: 100px;
-    /* Ensure readable columns */
     border-right: 1px solid var(--grid-line);
     position: relative;
     display: flex;
@@ -265,6 +308,7 @@ input:checked+.slider:before {
 
 .day-header {
     height: 40px;
+    /* Fixed height match spacer */
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -273,32 +317,22 @@ input:checked+.slider:before {
     font-weight: 600;
     color: var(--text-muted);
     background: var(--header-bg);
-    /* Distinct BG */
     border-bottom: 1px solid var(--grid-line);
-
     position: sticky;
     top: 0;
     z-index: 20;
-    /* Above events, below time col if overlapping, but time col is z-30 */
     text-transform: capitalize;
-    /* Full names */
+    box-sizing: border-box;
 }
 
 .day-body {
     position: relative;
     background-image: linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
     background-size: 100% var(--slot-height);
+    background-position: 0 0;
+    /* Align first line to top */
     flex: 1;
 }
-
-/* Fix corner overlap for sticky elements */
-/* The time column is sticky left. The day headers are sticky top. 
-   When scrubbing right, time col stays. 
-   When scrubbing down, headers stay. 
-   The intersection (top-left) needs to be handled.
-   With current HTML, time-column has padding-top 40px. 
-   We need a pseudo element on time-column to act as the "corner header" that is sticky top AND left.
-*/
 
 
 
@@ -307,8 +341,10 @@ input:checked+.slider:before {
     position: absolute;
     left: 4px;
     right: 4px;
-    padding: 2px 8px;
-    /* Slightly reduced padding for tighter fit */
+    /* padding: 2px 8px; */
+    /* Reset padding */
+    padding: 6px 8px;
+    /* Top left padding requested */
     border-radius: var(--radius-label);
     font-size: 13px;
     font-weight: 600;
@@ -319,9 +355,13 @@ input:checked+.slider:before {
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    /* Center Vertically if short */
+    justify-content: flex-start;
+    /* Align to top */
+    align-items: flex-start;
+    /* Align to left */
 }
+
+/* Remove centered styles */
 
 .event-card strong {
     white-space: nowrap;
