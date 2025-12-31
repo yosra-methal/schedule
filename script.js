@@ -132,10 +132,18 @@ function renderGrid() {
         // Body
         const body = document.createElement('div');
         body.className = 'day-body';
-        body.style.height = (totalHours * CONFIG.slotHeight) + 'px';
+        // Height not strictly needed if we obey content flow, but good for scroll consistency
+        // body.style.height = (totalHours * CONFIG.slotHeight) + 'px'; // Let cells dictate height
         body.dataset.dayIndex = dayIndex;
 
-        // Click to add
+        // Render Physical Cells
+        for (let i = 0; i < totalHours; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            body.appendChild(cell);
+        }
+
+        // Click to add (using bubbling from cells works, or body click)
         body.addEventListener('click', (e) => handleGridClick(e, dayIndex));
 
         // Render Events for this day

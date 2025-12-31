@@ -288,15 +288,17 @@ input:checked+.slider:before {
 
 .day-body {
     position: relative;
-    background-image: linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
-    background-size: 100% var(--slot-height);
-    background-position: 0 0;
-    /* Align first line to top */
-    border-bottom: 1px solid var(--grid-line);
-    /* Close the grid at the bottom */
-    box-sizing: content-box;
-    /* Exclude border from height to ensure exact inner pixels */
+    /* Removed linear-gradient, using discrete cells */
     flex: 1;
+    box-sizing: border-box;
+    /* Grid cells will provide borders */
+}
+
+.grid-cell {
+    height: var(--slot-height);
+    border-bottom: 1px solid var(--grid-line);
+    box-sizing: border-box;
+    width: 100%;
 }
 
 
