@@ -259,13 +259,15 @@ input:checked+.slider:before {
 .day-column {
     flex: 1;
     min-width: 100px;
-    border-right: 1px solid var(--grid-line);
+    border-right: none;
+    /* Moved to children */
     position: relative;
     display: flex;
     flex-direction: column;
 }
 
-.day-column:last-child {
+.day-column:last-child .day-header,
+.day-column:last-child .grid-cell {
     border-right: none;
 }
 
@@ -281,6 +283,8 @@ input:checked+.slider:before {
     color: var(--text-muted);
     background: var(--header-bg);
     border-bottom: 1px solid var(--grid-line);
+    border-right: 1px solid var(--grid-line);
+    /* Explicit border */
     position: sticky;
     top: 0;
     z-index: 2000;
@@ -300,6 +304,8 @@ input:checked+.slider:before {
 .grid-cell {
     height: var(--slot-height);
     border-bottom: 1px solid var(--grid-line);
+    border-right: 1px solid var(--grid-line);
+    /* Explicit border */
     box-sizing: border-box;
     width: 100%;
 }
