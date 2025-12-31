@@ -288,8 +288,8 @@ input:checked+.slider:before {
     /* Align first line to top */
     border-bottom: 1px solid var(--grid-line);
     /* Close the grid at the bottom */
-    box-sizing: border-box;
-    /* Include border in height */
+    box-sizing: content-box;
+    /* Exclude border from height to ensure exact inner pixels */
     flex: 1;
 }
 
