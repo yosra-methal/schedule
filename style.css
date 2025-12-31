@@ -422,20 +422,165 @@ input:checked+.slider:before {
     transition: transform 0.2s ease;
 }
 
-/* ... existing code ... */
+/* Restoring Modal Internals */
+.modal.visible .modal-content {
+    transform: scale(1);
+}
 
-/* 12h Time Input Styling */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fcfcfc;
+    transition: border-color 0.2s;
+    font-family: inherit;
+    color: #333;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--c-blue-border);
+    outline: none;
+    background: white;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+/* Color Picker */
+.color-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+.color-option {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s ease-in-out;
+}
+
+.color-option.selected {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 2px white, 0 0 8px 2px var(--glow-color);
+    /* Halo Effect */
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+/* Buttons */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.spacer {
+    flex: 1;
+}
+
+.btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #333;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #000;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background: #f5f5f5;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #e0e0e0;
+}
+
+.btn-danger {
+    background: #fff0f0;
+    color: #d32f2f;
+}
+
+.btn-danger:hover {
+    background: #ffe0e0;
+}
+
+/* 12h Time Input Layout */
 .time-12h {
     display: flex;
     align-items: center;
     gap: 8px;
-    /* Increased gap */
 }
 
 .t-input {
     width: 60px;
-    /* Increased from 48px */
-    padding: 10px 8px;
+    padding: 10px 4px;
+    /* Reduced side padding for centered text */
     text-align: center;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
@@ -451,13 +596,18 @@ input:checked+.slider:before {
 
 .t-select {
     width: 70px;
-    /* Increased from 60px */
     padding: 10px 4px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     font-size: 14px;
     background: #fcfcfc;
     text-align: center;
+}
+
+.t-select:focus {
+    border-color: var(--c-blue-border);
+    outline: none;
+    background: white;
 }
 
 .colon {
