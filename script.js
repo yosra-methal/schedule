@@ -206,10 +206,17 @@ function formatTimeDisplay(hour) {
     const mStr = m < 10 ? '0' + m : m;
 
     if (state.use24h) {
-        return `${h}:${mStr}`;
+        // Handle 24 as 00:00 or keep 24:00? 
+        // User requested support for 00:00. 
+        // But if it's the end of the day, 00:00 is fine.
+        const displayH = h === 24 ? '00' : h < 10 ? '0' + h : h;
+        return `${displayH}:${mStr}`;
     } else {
-        const suffix = h >= 12 ? 'PM' : 'AM';
-        const h12 = h % 12 || 12;
+        // 12h Format
+        // 0 -> 12 AM, 12 -> 12 PM, 24 -> 12 AM
+        const effectiveH = h % 24;
+        const suffix = effectiveH >= 12 ? 'PM' : 'AM';
+        const h12 = effectiveH % 12 || 12;
         return `${h12}:${mStr} ${suffix}`;
     }
 }
