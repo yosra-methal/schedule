@@ -201,14 +201,15 @@ input:checked+.slider:before {
 .time-column {
     position: sticky;
     left: 0;
-    z-index: 30;
+    z-index: 100;
+    /* Sidebar High Z-Index */
     width: 72px;
     /* Increased from 60px for AM/PM */
     min-width: 72px;
     background: var(--header-bg);
     border-right: 1px solid var(--grid-line);
     padding-top: 0;
-    /* padding-bottom removed, using precise sizing */
+    padding-bottom: 20px;
 }
 
 /* Corner Spacer in Time Column */
@@ -218,7 +219,8 @@ input:checked+.slider:before {
     top: 0;
     background: var(--header-bg);
     border-bottom: 1px solid var(--grid-line);
-    z-index: 40;
+    z-index: 101;
+    /* Highest in grid */
 }
 
 .time-slot {
@@ -281,7 +283,8 @@ input:checked+.slider:before {
     border-bottom: 1px solid var(--grid-line);
     position: sticky;
     top: 0;
-    z-index: 20;
+    z-index: 100;
+    /* Header High Z-Index */
     text-transform: capitalize;
     box-sizing: border-box;
 }
@@ -324,8 +327,8 @@ input:checked+.slider:before {
     flex-direction: column;
     justify-content: flex-start;
     /* Align to top */
-    align-items: flex-start;
     /* Align to left */
+    z-index: 10;
 }
 
 /* Remove centered styles */
