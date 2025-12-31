@@ -190,6 +190,8 @@ input:checked+.slider:before {
     flex: 1;
     overflow: auto;
     /* Handles both x and y scroll */
+    scroll-padding-top: 40px;
+    /* Ensures sticky headers don't obfuscate focus targets */
     position: relative;
     background: #fff;
     min-height: 0;
@@ -227,6 +229,13 @@ input:checked+.slider:before {
     padding-right: 12px;
     position: relative;
     top: -6px;
+    /* Keep slight offset but ensure it doesn't clip. Actually, let's reset to 0 for safety or use translation */
+    transform: translateY(-50%);
+    /* Center on the tick? No, just keep it simple */
+    top: 0;
+    /* Updated: align with top of slot to avoid clipping under header */
+    padding-top: 4px;
+    /* Slight push down for aesthetics */
     border-bottom: 1px solid transparent;
     /* Maintain box sizing if needed */
 }
