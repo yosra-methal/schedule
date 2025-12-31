@@ -265,7 +265,7 @@ function openModal(existingEvent = null) {
 
     if (existingEvent) {
         currentEditingId = existingEvent.id;
-        elements.modalTitle.textContent = 'Edit Event';
+        elements.modalTitle.textContent = 'Edit Entry';
         elements.form.title.value = existingEvent.title;
         elements.form.day.value = existingEvent.day;
         elements.form.start.value = existingEvent.start;
@@ -274,7 +274,7 @@ function openModal(existingEvent = null) {
         elements.btns.delete.classList.remove('hidden');
     } else {
         currentEditingId = null;
-        elements.modalTitle.textContent = 'New Event';
+        elements.modalTitle.textContent = 'New Entry';
         elements.form.title.value = '';
         // Day/Time might be pre-filled by quick add, otherwise default
         if (!elements.form.start.value) elements.form.start.value = '09:00';
