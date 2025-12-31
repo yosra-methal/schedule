@@ -306,7 +306,10 @@ function setupEventListeners() {
         if (!start || !end) return alert('Time is required');
 
         // Validation: End > Start
-        if (getDecimalHour(end) <= getDecimalHour(start)) {
+        const startH = getDecimalHour(start);
+        const endH = getDecimalHour(end);
+
+        if (endH <= startH) {
             return alert('Error: The end time must be after the start time.');
         }
 

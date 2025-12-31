@@ -208,8 +208,7 @@ input:checked+.slider:before {
     background: var(--header-bg);
     border-right: 1px solid var(--grid-line);
     padding-top: 0;
-    padding-bottom: 60px;
-    /* Fix bottom clipping with ample space */
+    /* padding-bottom removed, using precise sizing */
 }
 
 /* Corner Spacer in Time Column */
@@ -246,8 +245,7 @@ input:checked+.slider:before {
     display: flex;
     flex: 1;
     min-width: 800px;
-    padding-bottom: 60px;
-    /* Fix bottom clipping with ample space */
+    /* padding-bottom removed */
 }
 
 .day-column {
@@ -288,6 +286,10 @@ input:checked+.slider:before {
     background-size: 100% var(--slot-height);
     background-position: 0 0;
     /* Align first line to top */
+    border-bottom: 1px solid var(--grid-line);
+    /* Close the grid at the bottom */
+    box-sizing: border-box;
+    /* Include border in height */
     flex: 1;
 }
 
