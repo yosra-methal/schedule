@@ -1,0 +1,447 @@
+:root {
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --text-color: #333333;
+    --grid-line: #F0F0F0;
+    --card-bg: #FFFFFF;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --radius-card: 24px;
+    --radius-label: 8px;
+
+    /* Colors */
+    --c-blue-bg: #E1F5FE;
+    --c-blue-border: #0288D1;
+    --c-green-bg: #E8F5E9;
+    --c-green-border: #388E3C;
+    --c-rose-bg: #FCE4EC;
+    --c-rose-border: #D81B60;
+    --c-purple-bg: #F3E5F5;
+    --c-purple-border: #7B1FA2;
+    --c-orange-bg: #FFF0EB;
+    --c-orange-border: #FF8B66;
+    --c-grey-bg: #F5F5F5;
+    --c-grey-border: #616161;
+
+    --slot-height: 60px;
+    /* 1 hour height */
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    color: var(--text-color);
+    background-color: transparent;
+    /* For Notion embed blending if needed, but container is white */
+    padding: 20px;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    /* Allow scrolling if long */
+    overflow: hidden;
+    /* Main scroll handled inside widget if needed, or body scroll */
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #e0e0e0;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #d0d0d0;
+}
+
+.app-container {
+    background: var(--card-bg);
+    border-radius: var(--radius-card);
+    width: 100%;
+    max-width: 1200px;
+    height: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-md);
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+/* Header */
+.header {
+    padding: 20px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--grid-line);
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    z-index: 10;
+}
+
+.header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111;
+}
+
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #666;
+}
+
+/* Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 36px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 20px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked+.slider {
+    background-color: var(--c-grey-border);
+}
+
+input:checked+.slider:before {
+    transform: translateX(16px);
+}
+
+/* Layout */
+.planner-wrapper {
+    display: flex;
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+    scroll-behavior: smooth;
+}
+
+.time-column {
+    width: 60px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--grid-line);
+    background: #fff;
+    padding-top: 40px;
+    /* Header height offset */
+}
+
+.time-slot {
+    height: var(--slot-height);
+    font-size: 11px;
+    color: #999;
+    text-align: right;
+    padding-right: 12px;
+    position: relative;
+    top: -6px;
+    /* Align text with line */
+}
+
+.days-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    /* Rows are managed by height */
+    position: relative;
+    min-width: 600px;
+}
+
+.day-column {
+    position: relative;
+    border-right: 1px solid var(--grid-line);
+}
+
+.day-column:last-child {
+    border-right: none;
+}
+
+.day-header {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: #555;
+    border-bottom: 1px solid var(--grid-line);
+    position: sticky;
+    top: 0;
+    background: rgba(255, 255, 255, 0.95);
+    z-index: 5;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.day-body {
+    position: relative;
+    /* Height will be set by JS based on hours */
+    background-image: linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 100% var(--slot-height);
+    background-position: 0 0;
+    /* Align with top */
+}
+
+/* Events */
+.event-card {
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    padding: 4px 8px;
+    border-radius: var(--radius-label);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-color);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.event-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 2;
+}
+
+.event-card.blue {
+    background: var(--c-blue-bg);
+    border-left: 4px solid var(--c-blue-border);
+}
+
+.event-card.green {
+    background: var(--c-green-bg);
+    border-left: 4px solid var(--c-green-border);
+}
+
+.event-card.rose {
+    background: var(--c-rose-bg);
+    border-left: 4px solid var(--c-rose-border);
+}
+
+.event-card.purple {
+    background: var(--c-purple-bg);
+    border-left: 4px solid var(--c-purple-border);
+}
+
+.event-card.orange {
+    background: var(--c-orange-bg);
+    border-left: 4px solid var(--c-orange-border);
+}
+
+.event-card.grey {
+    background: var(--c-grey-bg);
+    border-left: 4px solid var(--c-grey-border);
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    backdrop-filter: blur(2px);
+}
+
+.modal.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-content {
+    background: white;
+    padding: 24px;
+    border-radius: 20px;
+    width: 360px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    transform: scale(0.95);
+    transition: transform 0.2s ease;
+}
+
+.modal.visible .modal-content {
+    transform: scale(1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #999;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fafafa;
+    transition: border-color 0.2s;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--c-blue-border);
+    outline: none;
+    background: white;
+}
+
+.form-row {
+    display: flex;
+    gap: 12px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.color-options {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.color-option {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: transform 0.2s;
+}
+
+.color-option.selected {
+    transform: scale(1.2);
+    box-shadow: 0 0 0 2px #333;
+}
+
+.color-option:hover {
+    transform: scale(1.1);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.spacer {
+    flex: 1;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background: #111;
+    color: white;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.btn-secondary {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.btn-danger {
+    background: #ffebee;
+    color: #d32f2f;
+}
+
+.hidden {
+    display: none !important;
+}
