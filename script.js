@@ -443,8 +443,16 @@ function setupEventListeners() {
     timeInputs.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
-            el.addEventListener('input', () => el.classList.remove('input-error'));
-            el.addEventListener('focus', () => el.classList.remove('input-error'));
+            el.addEventListener('input', () => {
+                el.classList.remove('input-error');
+                const errMsg = document.getElementById('time-error-msg');
+                if (errMsg) errMsg.classList.add('hidden');
+            });
+            el.addEventListener('focus', () => {
+                el.classList.remove('input-error');
+                const errMsg = document.getElementById('time-error-msg');
+                if (errMsg) errMsg.classList.add('hidden');
+            });
         }
     });
 
@@ -482,8 +490,12 @@ function setupEventListeners() {
                 const el = document.getElementById(id);
                 if (el) el.classList.add('input-error');
             });
-            // Stop save
-            return;
+
+            // Show error message
+            const errMsg = document.getElementById('time-error-msg');
+            if (errMsg) errMsg.classList.remove('hidden');
+
+            return; // Stop save
         }
 
         // Clear any residual errors

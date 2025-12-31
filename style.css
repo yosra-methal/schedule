@@ -632,3 +632,10 @@ input:checked+.slider:before {
     border: 1px solid #FF3B30 !important;
     box-shadow: 0 0 0 1px #FF3B30 !important;
 }
+
+.error-text {
+    color: #FF3B30;
+    font-size: 11px;
+    margin-top: 4px;
+    font-weight: 500;
+}
