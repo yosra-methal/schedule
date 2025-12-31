@@ -69,32 +69,29 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label>Start</label>
-                        <!-- 24h Input -->
-                        <input type="time" id="event-start" class="time-24h">
-                        <!-- 12h Group -->
-                        <div id="start-12h" class="time-12h hidden">
-                            <input type="number" id="start-h" min="1" max="12" placeholder="12" class="t-input">
+                        <div id="start-wrapper" class="time-12h">
+                            <input type="number" id="start-h" min="0" max="23" placeholder="09" class="t-input">
                             <span class="colon">:</span>
                             <input type="number" id="start-m" min="0" max="59" placeholder="00" class="t-input">
-                            <select id="start-ampm" class="t-select">
+                            <select id="start-ampm" class="t-select hidden">
                                 <option value="AM">AM</option>
                                 <option value="PM">PM</option>
                             </select>
+                            <!-- Hidden storage for easy access or just use JS to build -->
+                            <input type="hidden" id="event-start">
                         </div>
                     </div>
                     <div class="form-group">
                         <label>End</label>
-                        <!-- 24h Input -->
-                        <input type="time" id="event-end" class="time-24h">
-                        <!-- 12h Group -->
-                        <div id="end-12h" class="time-12h hidden">
-                            <input type="number" id="end-h" min="1" max="12" placeholder="12" class="t-input">
+                        <div id="end-wrapper" class="time-12h">
+                            <input type="number" id="end-h" min="0" max="23" placeholder="10" class="t-input">
                             <span class="colon">:</span>
                             <input type="number" id="end-m" min="0" max="59" placeholder="00" class="t-input">
-                            <select id="end-ampm" class="t-select">
+                            <select id="end-ampm" class="t-select hidden">
                                 <option value="AM">AM</option>
                                 <option value="PM">PM</option>
                             </select>
+                            <input type="hidden" id="event-end">
                         </div>
                     </div>
                 </div>

@@ -31,6 +31,8 @@ const elements = {
     form: {
         title: document.getElementById('event-title'),
         day: document.getElementById('event-day'),
+        // Start/End are now handled via specific H/M inputs, 
+        // but we might still use hidden inputs for state transfer
         start: document.getElementById('event-start'),
         end: document.getElementById('event-end'),
         colorContainer: document.getElementById('color-options')
@@ -126,10 +128,6 @@ function renderGrid() {
 
     // Render Days Columns
     const totalHours = state.viewEnd - state.viewStart;
-
-    // We expect totalHours rows. 
-    // Example: 8 to 18 (10 hours). Cells 0..9.
-    // Example: 8 to 19 (11 hours). Cells 0..10.
 
     DAYS.forEach((dayName, dayIndex) => {
         const col = document.createElement('div');
@@ -264,7 +262,6 @@ function formatTimeRange(start, end) {
 }
 
 // Modal handling
-// Modal handling
 function renderColorOptions() {
     elements.form.colorContainer.innerHTML = '';
     CONFIG.colors.forEach(c => {
@@ -285,69 +282,79 @@ function renderColorOptions() {
     });
 }
 
-function updateTimeInputVisibility() {
+// Unified Input Logic
+function updateInputMode() {
     const is24 = state.use24h;
-    document.querySelectorAll('.time-24h').forEach(el => el.classList.toggle('hidden', !is24));
-    document.querySelectorAll('.time-12h').forEach(el => el.classList.toggle('hidden', is24));
+
+    // Toggle AM/PM visibility
+    document.getElementById('start-ampm').classList.toggle('hidden', is24);
+    document.getElementById('end-ampm').classList.toggle('hidden', is24);
+
+    // Update constraints
+    const maxHour = is24 ? 23 : 12;
+    const minHour = is24 ? 0 : 1;
+
+    ['start', 'end'].forEach(prefix => {
+        const hInput = document.getElementById(`${prefix}-h`);
+        if (hInput) {
+            hInput.setAttribute('max', maxHour);
+            hInput.setAttribute('min', minHour);
+        }
+    });
 }
 
 function setTimeInputs(startStr, endStr) {
-    if (state.use24h) {
-        document.getElementById('event-start').value = startStr;
-        document.getElementById('event-end').value = endStr;
-    } else {
-        // Parse 24h string to 12h components
-        const parse12 = (str) => {
-            let [h, m] = str.split(':').map(Number);
+    // startStr/endStr are always 24h "HH:mm" from internal data
+    const parse = (str) => {
+        let [h, m] = str.split(':').map(Number);
+
+        if (state.use24h) {
+            return { h, m, suffix: null };
+        } else {
             const suffix = h >= 12 ? 'PM' : 'AM';
             h = h % 12 || 12;
             return { h, m, suffix };
-        };
+        }
+    };
 
-        const s = parse12(startStr);
-        document.getElementById('start-h').value = s.h;
-        document.getElementById('start-m').value = s.m < 10 ? '0' + s.m : s.m;
-        document.getElementById('start-ampm').value = s.suffix;
+    const s = parse(startStr);
+    document.getElementById('start-h').value = s.h.toString().padStart(2, '0');
+    document.getElementById('start-m').value = s.m.toString().padStart(2, '0');
+    if (s.suffix) document.getElementById('start-ampm').value = s.suffix;
 
-        const e = parse12(endStr);
-        document.getElementById('end-h').value = e.h;
-        document.getElementById('end-m').value = e.m < 10 ? '0' + e.m : e.m;
-        document.getElementById('end-ampm').value = e.suffix;
-    }
+    const e = parse(endStr);
+    document.getElementById('end-h').value = e.h.toString().padStart(2, '0');
+    document.getElementById('end-m').value = e.m.toString().padStart(2, '0');
+    if (e.suffix) document.getElementById('end-ampm').value = e.suffix;
 }
 
 function getTimeInputValues() {
-    if (state.use24h) {
-        return {
-            start: document.getElementById('event-start').value,
-            end: document.getElementById('event-end').value
-        };
-    } else {
-        const get24 = (prefix) => {
-            let h = parseInt(document.getElementById(`${prefix}-h`).value, 10);
-            const m = parseInt(document.getElementById(`${prefix}-m`).value, 10);
+    const get24 = (prefix) => {
+        let h = parseInt(document.getElementById(`${prefix}-h`).value, 10);
+        const m = parseInt(document.getElementById(`${prefix}-m`).value, 10);
+
+        if (isNaN(h) || isNaN(m)) return '';
+
+        if (!state.use24h) {
             const suffix = document.getElementById(`${prefix}-ampm`).value;
-
-            if (isNaN(h) || isNaN(m)) return ''; // Handle empty
-
             if (suffix === 'PM' && h < 12) h += 12;
             if (suffix === 'AM' && h === 12) h = 0;
+        }
 
-            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-        };
+        return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    };
 
-        return {
-            start: get24('start'),
-            end: get24('end')
-        };
-    }
+    return {
+        start: get24('start'),
+        end: get24('end')
+    };
 }
 
 function openModal(existingEvent = null) {
     elements.modal.classList.remove('hidden');
     setTimeout(() => elements.modal.classList.add('visible'), 10);
 
-    updateTimeInputVisibility();
+    updateInputMode();
 
     let startVal = '09:00';
     let endVal = '10:00';
@@ -369,15 +376,17 @@ function openModal(existingEvent = null) {
         selectedColor = CONFIG.colors[0].id;
         elements.btns.delete.classList.add('hidden');
 
-        // If quick add via grid click, values might be preset in form
-        // But we need to sync them to the UI mode
-        if (elements.form.start.value) startVal = elements.form.start.value;
-        if (elements.form.end.value) endVal = elements.form.end.value;
+        // Use hidden inputs as transfer state from grid clicks
+        const hideStart = document.getElementById('event-start');
+        const hideEnd = document.getElementById('event-end');
+        if (hideStart && hideStart.value) startVal = hideStart.value;
+        if (hideEnd && hideEnd.value) endVal = hideEnd.value;
         if (elements.form.day.value) dayVal = elements.form.day.value;
     }
 
     elements.form.title.value = titleVal;
     elements.form.day.value = dayVal;
+
     setTimeInputs(startVal, endVal);
 
     // Update color selection UI
@@ -389,32 +398,35 @@ function openModal(existingEvent = null) {
 function closeModal() {
     elements.modal.classList.remove('visible');
     setTimeout(() => elements.modal.classList.add('hidden'), 200);
+    // Clear transfer state
+    const hideStart = document.getElementById('event-start');
+    const hideEnd = document.getElementById('event-end');
+    if (hideStart) hideStart.value = '';
+    if (hideEnd) hideEnd.value = '';
 }
 
 function handleGridClick(e, dayIndex) {
     if (e.target.classList.contains('event-card')) return;
 
-    // Calculate clicked time
     const rect = e.currentTarget.getBoundingClientRect();
-    const offsetY = e.clientY - rect.top; // pixels from top of day-body
+    const offsetY = e.clientY - rect.top;
     const clickedH = state.viewStart + (offsetY / CONFIG.slotHeight);
 
-    // Round to nearest 30 mins
     const h = Math.floor(clickedH);
     const m = Math.floor((clickedH - h) * 60);
-
-    // Round m to 0 or 30
     const mRounded = m < 30 ? 0 : 30;
 
     const startStr = `${h.toString().padStart(2, '0')}:${mRounded.toString().padStart(2, '0')}`;
     const endH = h + 1;
     const endStr = `${endH.toString().padStart(2, '0')}:${mRounded.toString().padStart(2, '0')}`;
 
-    // Pre-set values in standard elements (or just pass to openModal via a temp object? 
-    // actually openModal reads them if currentEditingId is null)
+    // Set transfer state
+    const hideStart = document.getElementById('event-start');
+    const hideEnd = document.getElementById('event-end');
+    if (hideStart) hideStart.value = startStr;
+    if (hideEnd) hideEnd.value = endStr;
+
     elements.form.day.value = dayIndex;
-    elements.form.start.value = startStr;
-    elements.form.end.value = endStr;
 
     openModal();
 }
@@ -423,9 +435,8 @@ function setupEventListeners() {
     elements.btns.cancel.addEventListener('click', closeModal);
     elements.btns.close.addEventListener('click', closeModal);
     elements.btns.add.addEventListener('click', () => {
-        // clear presets
-        elements.form.start.value = '09:00';
-        elements.form.end.value = '10:00';
+        // clear presets via standard
+        elements.form.day.value = '0';
         openModal();
     });
 
@@ -481,16 +492,26 @@ function setupEventListeners() {
     });
 
     elements.toggle.addEventListener('change', (e) => {
+        // Capture current values before switching
+        let currentStart = '09:00';
+        let currentEnd = '10:00';
+
+        // If modal visible, try to read current form state
+        if (elements.modal.classList.contains('visible')) {
+            const t = getTimeInputValues();
+            if (t.start && t.end) {
+                currentStart = t.start;
+                currentEnd = t.end;
+            }
+        }
+
         state.use24h = !e.target.checked;
         saveData();
-        // If modal is open, we should probably update it? 
+
+        // If modal open, refresh inputs
         if (elements.modal.classList.contains('visible')) {
-            // Re-read current values, switch mode, re-set values
-            // bit complex, easiest is to just re-open or let user close/reopen
-            // But for UX:
-            const current = getTimeInputValues();
-            updateTimeInputVisibility();
-            setTimeInputs(current.start, current.end);
+            updateInputMode();
+            setTimeInputs(currentStart, currentEnd);
         }
     });
 }
