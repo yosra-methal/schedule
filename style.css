@@ -201,7 +201,7 @@ input:checked+.slider:before {
 .time-column {
     position: sticky;
     left: 0;
-    z-index: 100;
+    z-index: 2000;
     /* Sidebar High Z-Index */
     width: 72px;
     /* Increased from 60px for AM/PM */
@@ -219,7 +219,7 @@ input:checked+.slider:before {
     top: 0;
     background: var(--header-bg);
     border-bottom: 1px solid var(--grid-line);
-    z-index: 101;
+    z-index: 2001;
     /* Highest in grid */
 }
 
@@ -283,7 +283,7 @@ input:checked+.slider:before {
     border-bottom: 1px solid var(--grid-line);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 2000;
     /* Header High Z-Index */
     text-transform: capitalize;
     box-sizing: border-box;
@@ -348,7 +348,7 @@ input:checked+.slider:before {
 .event-card:hover {
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    z-index: 100;
+    z-index: 1500 !important;
 }
 
 .event-card.blue {
@@ -392,7 +392,7 @@ input:checked+.slider:before {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 3000;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;

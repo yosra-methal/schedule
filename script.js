@@ -176,6 +176,8 @@ function createEventElement(ev) {
 
     el.style.top = `${top}px`;
     el.style.height = `${height}px`;
+    // Stacking: Later events on top
+    el.style.zIndex = Math.floor(startH * 60);
 
     // Content
     el.innerHTML = `
