@@ -232,9 +232,17 @@ function formatTimeDisplay(hour) {
     }
 }
 
+function formatTimeString(timeStr) {
+    if (state.use24h) return timeStr;
+    const [h, m] = timeStr.split(':').map(Number);
+    const suffix = h >= 12 && h < 24 ? 'PM' : 'AM';
+    const h12 = h % 12 || 12;
+    const mStr = m < 10 ? '0' + m : m;
+    return `${h12}:${mStr} ${suffix}`;
+}
+
 function formatTimeRange(start, end) {
-    // Simple formatter for event card
-    return `${start} - ${end}`;
+    return `${formatTimeString(start)} - ${formatTimeString(end)}`;
 }
 
 // Modal handling
@@ -370,11 +378,10 @@ function setupEventListeners() {
 
     elements.btns.delete.addEventListener('click', () => {
         if (!currentEditingId) return;
-        if (confirm('Delete this event?')) {
-            state.events = state.events.filter(e => e.id !== currentEditingId);
-            saveData();
-            closeModal();
-        }
+        // Direct delete for Notion compatibility (window.confirm is often blocked in embeds)
+        state.events = state.events.filter(e => e.id !== currentEditingId);
+        saveData();
+        closeModal();
     });
 
     elements.toggle.addEventListener('change', (e) => {
