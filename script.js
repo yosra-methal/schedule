@@ -307,7 +307,7 @@ function setupEventListeners() {
 
         // Validation: End > Start
         if (getDecimalHour(end) <= getDecimalHour(start)) {
-            return alert('End time must be after start time');
+            return alert('Error: The end time must be after the start time.');
         }
 
         if (currentEditingId) {

@@ -208,7 +208,8 @@ input:checked+.slider:before {
     background: var(--header-bg);
     border-right: 1px solid var(--grid-line);
     padding-top: 0;
-    padding-bottom: 20px;
+    padding-bottom: 60px;
+    /* Fix bottom clipping with ample space */
 }
 
 /* Corner Spacer in Time Column */
@@ -245,7 +246,8 @@ input:checked+.slider:before {
     display: flex;
     flex: 1;
     min-width: 800px;
-    padding-bottom: 20px;
+    padding-bottom: 60px;
+    /* Fix bottom clipping with ample space */
 }
 
 .day-column {
