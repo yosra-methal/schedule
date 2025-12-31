@@ -86,7 +86,9 @@ function calculateViewRange() {
 
     state.events.forEach(ev => {
         const startH = getDecimalHour(ev.start);
-        const endH = getDecimalHour(ev.end);
+        let endH = getDecimalHour(ev.end);
+        if (endH === 0 && startH > 0) endH = 24; // Handle midnight end
+
         if (startH < min) min = Math.floor(startH);
         if (endH > max) max = Math.ceil(endH);
     });
@@ -163,7 +165,9 @@ function createEventElement(ev) {
     el.className = `event-card ${ev.color}`;
 
     const startH = getDecimalHour(ev.start);
-    const endH = getDecimalHour(ev.end);
+    let endH = getDecimalHour(ev.end);
+    if (endH === 0 && startH > 0) endH = 24;
+
     const duration = endH - startH;
 
     // Top relative to viewStart
@@ -316,7 +320,12 @@ function setupEventListeners() {
 
         // Validation: End > Start
         const startH = getDecimalHour(start);
-        const endH = getDecimalHour(end);
+        let endH = getDecimalHour(end);
+
+        // Handle midnight end
+        if (endH === 0 && startH > 0) {
+            endH = 24;
+        }
 
         if (endH <= startH) {
             return alert('Error: The end time must be after the start time.');
