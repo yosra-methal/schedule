@@ -186,91 +186,14 @@ input:checked+.slider:before {
 /* Layout */
 .planner-wrapper {
     display: flex;
-    flex: 1;
-    overflow: hidden;
-    /* Scroll handled internally */
-    position: relative;
-}
-
-.time-column {
-    width: 60px;
-    flex-shrink: 0;
-    border-right: 1px solid var(--grid-line);
-    background: var(--header-bg);
-    /* Distinct background */
-    padding-top: 40px;
-    /* Header offset */
-    overflow-y: hidden;
-    /* Syncs with grid scroll via JS if needed, but easier if shared container. 
-                           Actually, we want better scrolling. Let's make wrapper scrollable.
-                           If wrapper is scrollable, time column and headers need to be sticky. */
-}
-
-/* 
-   Better approach for scroll: 
-   Wrapper has overflow: auto.
-   Time column is sticky left.
-   Header is sticky top.
-   Corner is sticky top-left.
-*/
-
-.planner-wrapper {
-    overflow: auto;
-    /* Enable scrollbars */
-    /* Custom scrollbar for planner area */
-}
-
-/* Corner piece (top-left) */
-.planner-wrapper::before {
-    content: '';
-    position: sticky;
-    top: 0;
-    left: 0;
-    width: 60px;
-    height: 40px;
-    z-index: 20;
-    background: var(--header-bg);
-    border-bottom: 1px solid var(--grid-line);
-    border-right: 1px solid var(--grid-line);
-    display: block;
-    float: left;
-    /* To sit in flow? No, this is tricky in flex/grid mixes. */
-}
-
-/* Re-structuring for sticky headers/cols requires a Grid Container usually. */
-/* Let's stick to the current flex structure but make sure it handles overflow nicely. */
-
-/* REVISED STRUCTURE IN CSS */
-.planner-wrapper {
-    display: grid;
-    grid-template-columns: 60px 1fr;
-    grid-template-rows: 40px 1fr;
-    overflow: auto;
-    flex: 1;
-}
-
-/* Corner */
-.grid-corner {
-    /* Virtual element if not in HTML, but we have structure: time-column and days-grid. */
-    /* This current HTML structure is:
-       planner-wrapper -> [time-column] [days-grid]
-       time-column contains time-slots.
-       days-grid contains day-columns -> [header] [body]
-       
-       This structure is hard to make fully sticky in both directions easily without restructure.
-       However, we can make planner-wrapper overflow-y: auto.
-       And ensure days-grid is min-width for x-scroll.
-    */
-}
-
-/* Resetting to fit current HTML logic but improved */
-.planner-wrapper {
-    display: flex;
     flex-direction: row;
-    overflow-y: auto;
-    overflow-x: auto;
+    flex: 1;
+    overflow: auto;
+    /* Handles both x and y scroll */
     position: relative;
     background: #fff;
+    min-height: 0;
+    /* Important for nested flex scroll */
 }
 
 .time-column {
@@ -281,8 +204,19 @@ input:checked+.slider:before {
     min-width: 60px;
     background: var(--header-bg);
     border-right: 1px solid var(--grid-line);
-    padding-top: 40px;
-    /* Offset for header */
+    /* Remove padding-top, we will use a spacer element for the corner */
+    padding-top: 0;
+}
+
+/* Corner Spacer in Time Column */
+.time-corner-spacer {
+    height: 40px;
+    position: sticky;
+    top: 0;
+    background: var(--header-bg);
+    border-bottom: 1px solid var(--grid-line);
+    z-index: 40;
+    /* Above time slots */
 }
 
 .time-slot {
@@ -293,14 +227,20 @@ input:checked+.slider:before {
     padding-right: 12px;
     position: relative;
     top: -6px;
+    border-bottom: 1px solid transparent;
+    /* Maintain box sizing if needed */
 }
 
 .days-grid {
     display: flex;
-    /* Flex based columns */
-    min-width: 800px;
-    /* Ensure valid width on small screens so scroll appears */
     flex: 1;
+    min-width: 800px;
+    /* Force horizontal scroll on small screens */
+}
+
+min-width: 800px;
+/* Ensure valid width on small screens so scroll appears */
+flex: 1;
 }
 
 .day-column {
@@ -354,18 +294,7 @@ input:checked+.slider:before {
    We need a pseudo element on time-column to act as the "corner header" that is sticky top AND left.
 */
 
-.time-column::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 40px;
-    /* Header height */
-    background: var(--header-bg);
-    border-bottom: 1px solid #e0e0e0;
-    z-index: 40;
-}
+
 
 /* Events */
 .event-card {

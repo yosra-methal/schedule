@@ -100,24 +100,24 @@ function renderGrid() {
     elements.timeColumn.innerHTML = '';
     elements.daysGrid.innerHTML = '';
 
+    // Corner Spacer
+    const cornerSpacer = document.createElement('div');
+    cornerSpacer.className = 'time-corner-spacer';
+    elements.timeColumn.appendChild(cornerSpacer);
+
     // Render Time Column
     // We render labels for each hour from viewStart to viewEnd
-    // If viewStart is 8, first label is 08:00 at top (0px).
+    // If viewStart is 8, first label is 08:00
     // Last label is viewEnd.
-    const totalHours = state.viewEnd - state.viewStart;
-
-    // Create header spacer for time column?
-    // The design has days header. We need to match that.
-    // Actually, checking styles again: .time-column has padding-top: 40px to match header.
-
     for (let h = state.viewStart; h <= state.viewEnd; h++) {
         const timeDiv = document.createElement('div');
         timeDiv.className = 'time-slot';
-        timeDiv.textContent = formatTimeDisplay(h); // Helper for 12/24h
+        timeDiv.textContent = formatTimeDisplay(h);
         elements.timeColumn.appendChild(timeDiv);
     }
 
     // Render Days
+    const totalHours = state.viewEnd - state.viewStart;
     DAYS.forEach((dayName, dayIndex) => {
         const col = document.createElement('div');
         col.className = 'day-column';
