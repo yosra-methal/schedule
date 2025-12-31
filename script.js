@@ -403,6 +403,9 @@ function closeModal() {
     const hideEnd = document.getElementById('event-end');
     if (hideStart) hideStart.value = '';
     if (hideEnd) hideEnd.value = '';
+
+    // Clear validation errors
+    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
 }
 
 function handleGridClick(e, dayIndex) {
@@ -432,10 +435,22 @@ function handleGridClick(e, dayIndex) {
 }
 
 function setupEventListeners() {
+    // Clear errors on interaction
+    const timeInputs = [
+        'start-h', 'start-m', 'start-ampm',
+        'end-h', 'end-m', 'end-ampm'
+    ];
+    timeInputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.addEventListener('input', () => el.classList.remove('input-error'));
+            el.addEventListener('focus', () => el.classList.remove('input-error'));
+        }
+    });
+
     elements.btns.cancel.addEventListener('click', closeModal);
     elements.btns.close.addEventListener('click', closeModal);
     elements.btns.add.addEventListener('click', () => {
-        // clear presets via standard
         elements.form.day.value = '0';
         openModal();
     });
@@ -449,7 +464,7 @@ function setupEventListeners() {
         const end = times.end;
         const color = selectedColor;
 
-        if (!start || !end) return alert('Time is required');
+        if (!start || !end) return;
 
         // Validation: End > Start
         const startH = getDecimalHour(start);
@@ -460,9 +475,19 @@ function setupEventListeners() {
             endH = 24;
         }
 
+        // Silent Validation (Red Borders) - Only on Save
         if (endH <= startH) {
-            return alert('Error: The end time must be after the start time.');
+            // Highlight End Time Inputs
+            ['end-h', 'end-m', 'end-ampm'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('input-error');
+            });
+            // Stop save
+            return;
         }
+
+        // Clear any residual errors
+        document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
 
         if (currentEditingId) {
             // Update
@@ -485,7 +510,7 @@ function setupEventListeners() {
 
     elements.btns.delete.addEventListener('click', () => {
         if (!currentEditingId) return;
-        // Direct delete for Notion compatibility (window.confirm is often blocked in embeds)
+        // Direct delete for Notion compatibility
         state.events = state.events.filter(e => e.id !== currentEditingId);
         saveData();
         closeModal();
@@ -496,7 +521,6 @@ function setupEventListeners() {
         let currentStart = '09:00';
         let currentEnd = '10:00';
 
-        // If modal visible, try to read current form state
         if (elements.modal.classList.contains('visible')) {
             const t = getTimeInputValues();
             if (t.start && t.end) {
@@ -508,7 +532,6 @@ function setupEventListeners() {
         state.use24h = !e.target.checked;
         saveData();
 
-        // If modal open, refresh inputs
         if (elements.modal.classList.contains('visible')) {
             updateInputMode();
             setTimeInputs(currentStart, currentEnd);

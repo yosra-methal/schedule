@@ -627,3 +627,8 @@ input:checked+.slider:before {
 .hidden {
     display: none !important;
 }
+
+.input-error {
+    border: 1px solid #FF3B30 !important;
+    box-shadow: 0 0 0 1px #FF3B30 !important;
+}
