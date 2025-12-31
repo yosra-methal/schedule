@@ -238,10 +238,7 @@ input:checked+.slider:before {
     /* Force horizontal scroll on small screens */
 }
 
-min-width: 800px;
-/* Ensure valid width on small screens so scroll appears */
-flex: 1;
-}
+
 
 .day-column {
     flex: 1;
