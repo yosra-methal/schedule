@@ -84,21 +84,27 @@ function calculateViewRange() {
     let min = CONFIG.defaultStart;
     let max = CONFIG.defaultEnd;
 
-    state.events.forEach(ev => {
-        const startH = getDecimalHour(ev.start);
-        let endH = getDecimalHour(ev.end);
-        if (endH === 0 && startH > 0) endH = 24; // Handle midnight end
+    if (state.events.length > 0) {
+        state.events.forEach(ev => {
+            if (!ev.start || !ev.end) return;
+            const startH = getDecimalHour(ev.start);
+            let endH = getDecimalHour(ev.end);
 
-        if (startH < min) min = Math.floor(startH);
-        if (endH > max) max = Math.ceil(endH);
-    });
+            // Handle midnight end (00:00 -> 24.0)
+            if (endH === 0 && startH > 0) endH = 24.0;
+            // Handle midnight start (00:00 -> 0.0) - already handled by split
+
+            if (!isNaN(startH) && startH < min) min = Math.floor(startH);
+            if (!isNaN(endH) && endH > max) max = Math.ceil(endH);
+        });
+    }
 
     state.viewStart = min;
     state.viewEnd = max;
 }
 
 function renderGrid() {
-    // Clear
+    // Clear existing
     elements.timeColumn.innerHTML = '';
     elements.daysGrid.innerHTML = '';
 
@@ -107,20 +113,24 @@ function renderGrid() {
     cornerSpacer.className = 'time-corner-spacer';
     elements.timeColumn.appendChild(cornerSpacer);
 
-    // Render Time Column
-    // We render labels for each hour from viewStart to viewEnd
-    // If viewStart is 8, first label is 08:00
-    // Last label is viewEnd.
+    // Render Time Column Labels
+    // Range: viewStart to viewEnd
     for (let h = state.viewStart; h <= state.viewEnd; h++) {
         const timeDiv = document.createElement('div');
         timeDiv.className = 'time-slot';
+        // Mark the very last label so it doesn't add height if we want flush bottom
         if (h === state.viewEnd) timeDiv.classList.add('last-slot');
         timeDiv.textContent = formatTimeDisplay(h);
         elements.timeColumn.appendChild(timeDiv);
     }
 
-    // Render Days
+    // Render Days Columns
     const totalHours = state.viewEnd - state.viewStart;
+
+    // We expect totalHours rows. 
+    // Example: 8 to 18 (10 hours). Cells 0..9.
+    // Example: 8 to 19 (11 hours). Cells 0..10.
+
     DAYS.forEach((dayName, dayIndex) => {
         const col = document.createElement('div');
         col.className = 'day-column';
@@ -131,24 +141,23 @@ function renderGrid() {
         header.textContent = dayName;
         col.appendChild(header);
 
-        // Body
+        // Body container
         const body = document.createElement('div');
         body.className = 'day-body';
-        // Height not strictly needed if we obey content flow, but good for scroll consistency
-        // body.style.height = (totalHours * CONFIG.slotHeight) + 'px'; // Let cells dictate height
         body.dataset.dayIndex = dayIndex;
+        // Don't fix height, let content define it
 
-        // Render Physical Cells
+        // Render Physical Cells (Rows)
         for (let i = 0; i < totalHours; i++) {
             const cell = document.createElement('div');
             cell.className = 'grid-cell';
             body.appendChild(cell);
         }
 
-        // Click to add (using bubbling from cells works, or body click)
+        // Click handler for creating events
         body.addEventListener('click', (e) => handleGridClick(e, dayIndex));
 
-        // Render Events for this day
+        // Render Events
         const dayEvents = state.events.filter(e => e.day == dayIndex);
         dayEvents.forEach(ev => {
             const evEl = createEventElement(ev);
