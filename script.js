@@ -206,7 +206,25 @@ function createEventElement(ev) {
 
 // Helpers
 function getDecimalHour(timeStr) {
-    const [h, m] = timeStr.split(':').map(Number);
+    // Normalize to 24h if AM/PM is present (unlikely with type=time but safe)
+    let str = timeStr.trim().toLowerCase();
+    const isPM = str.includes('pm');
+    const isAM = str.includes('am');
+
+    // Remove suffixes
+    str = str.replace(/(am|pm)/g, '').trim();
+
+    const [hStr, mStr] = str.split(':');
+    let h = parseInt(hStr, 10);
+    const m = parseInt(mStr, 10);
+
+    if (isNaN(h) || isNaN(m)) return 0;
+
+    // 12h conversion if detected
+    if (isPM && h < 12) h += 12;
+    if (isAM && h === 12) h = 0;
+    // Note: If no suffix, assume 24h standard (e.g. "13:00", "00:00")
+
     return h + m / 60;
 }
 
