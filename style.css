@@ -241,6 +241,12 @@ input:checked+.slider:before {
     border-bottom: 1px solid transparent;
 }
 
+.time-slot.last-slot {
+    height: 0;
+    /* Don't take up space, just show label */
+    overflow: visible;
+}
+
 .days-grid {
     display: flex;
     flex: 1;

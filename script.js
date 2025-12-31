@@ -112,6 +112,7 @@ function renderGrid() {
     for (let h = state.viewStart; h <= state.viewEnd; h++) {
         const timeDiv = document.createElement('div');
         timeDiv.className = 'time-slot';
+        if (h === state.viewEnd) timeDiv.classList.add('last-slot');
         timeDiv.textContent = formatTimeDisplay(h);
         elements.timeColumn.appendChild(timeDiv);
     }
