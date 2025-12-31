@@ -414,9 +414,8 @@ input:checked+.slider:before {
     background: white;
     padding: 24px;
     border-radius: 20px;
-    border-radius: 20px;
-    width: 450px;
-    /* Increased from 380px */
+    width: 500px;
+    /* Increased to 500px for fluid inputs */
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     transform: scale(0.95);
     transition: transform 0.2s ease;
@@ -571,23 +570,25 @@ input:checked+.slider:before {
 }
 
 /* 12h Time Input Layout */
+/* 12h Time Input Layout */
 .time-12h {
     display: flex;
     align-items: center;
-    gap: 12px;
-    /* Increased spacing */
+    gap: 10px;
+    width: 100%;
 }
 
 .t-input {
-    width: 70px;
-    /* Wider for 2 digits + spinner */
-    padding: 8px 10px;
-    /* More breathing room */
+    flex: 1;
+    /* Fluid width */
+    padding: 0.5rem;
     text-align: center;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     font-size: 14px;
     background: #fcfcfc;
+    min-width: 0;
+    /* Prevent flex overflow */
 }
 
 .t-input:focus {
@@ -597,14 +598,15 @@ input:checked+.slider:before {
 }
 
 .t-select {
-    width: 80px;
-    /* Wider for AM/PM + arrow */
-    padding: 8px 10px;
+    flex: 1;
+    /* Fluid width */
+    padding: 0.5rem;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     font-size: 14px;
     background: #fcfcfc;
     text-align: center;
+    min-width: 0;
 }
 
 .t-select:focus {
