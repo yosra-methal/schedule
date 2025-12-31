@@ -208,6 +208,7 @@ input:checked+.slider:before {
     background: var(--header-bg);
     border-right: 1px solid var(--grid-line);
     padding-top: 0;
+    padding-bottom: 20px;
 }
 
 /* Corner Spacer in Time Column */
@@ -244,6 +245,7 @@ input:checked+.slider:before {
     display: flex;
     flex: 1;
     min-width: 800px;
+    padding-bottom: 20px;
 }
 
 .day-column {
@@ -478,24 +480,18 @@ input:checked+.slider:before {
     border: 2px solid transparent;
     /* default border */
     position: relative;
-    transition: transform 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s ease-in-out;
 }
 
 .color-option::after {
-    content: '';
-    display: block;
-    position: absolute;
-    top: -4px;
-    left: -4px;
-    right: -4px;
-    bottom: -4px;
-    border-radius: 50%;
-    border: 2px solid transparent;
-    transition: border-color 0.2s;
+    /* removed border ring logic */
+    content: none;
 }
 
-.color-option.selected::after {
-    border-color: #333;
+.color-option.selected {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 2px white, 0 0 8px 2px var(--glow-color);
+    /* Halo effect */
 }
 
 .color-option:hover {

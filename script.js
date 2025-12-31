@@ -213,9 +213,7 @@ function renderColorOptions() {
         const d = document.createElement('div');
         d.className = 'color-option';
         d.style.backgroundColor = c.bg;
-        d.style.borderColor = c.border; // Just for visual reference if needed, or stick to CSS class colors
-        // Ideally we use the class colors to ensure match
-        // But for selection circle, we can just use inline styles
+        d.style.setProperty('--glow-color', c.border);
         d.dataset.id = c.id;
         if (c.id === selectedColor) d.classList.add('selected');
 
