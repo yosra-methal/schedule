@@ -574,13 +574,15 @@ input:checked+.slider:before {
 .time-12h {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    /* Increased spacing */
 }
 
 .t-input {
-    width: 60px;
-    padding: 10px 4px;
-    /* Reduced side padding for centered text */
+    width: 70px;
+    /* Wider for 2 digits + spinner */
+    padding: 8px 10px;
+    /* More breathing room */
     text-align: center;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
@@ -595,8 +597,9 @@ input:checked+.slider:before {
 }
 
 .t-select {
-    width: 70px;
-    padding: 10px 4px;
+    width: 80px;
+    /* Wider for AM/PM + arrow */
+    padding: 8px 10px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     font-size: 14px;
