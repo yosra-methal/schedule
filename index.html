@@ -68,12 +68,34 @@
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="event-start">Start</label>
-                        <input type="time" id="event-start">
+                        <label>Start</label>
+                        <!-- 24h Input -->
+                        <input type="time" id="event-start" class="time-24h">
+                        <!-- 12h Group -->
+                        <div id="start-12h" class="time-12h hidden">
+                            <input type="number" id="start-h" min="1" max="12" placeholder="12" class="t-input">
+                            <span class="colon">:</span>
+                            <input type="number" id="start-m" min="0" max="59" placeholder="00" class="t-input">
+                            <select id="start-ampm" class="t-select">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="event-end">End</label>
-                        <input type="time" id="event-end">
+                        <label>End</label>
+                        <!-- 24h Input -->
+                        <input type="time" id="event-end" class="time-24h">
+                        <!-- 12h Group -->
+                        <div id="end-12h" class="time-12h hidden">
+                            <input type="number" id="end-h" min="1" max="12" placeholder="12" class="t-input">
+                            <span class="colon">:</span>
+                            <input type="number" id="end-m" min="0" max="59" placeholder="00" class="t-input">
+                            <select id="end-ampm" class="t-select">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 

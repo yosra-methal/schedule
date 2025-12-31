@@ -571,6 +571,45 @@ input:checked+.slider:before {
     background: #ffe0e0;
 }
 
+/* 12h Time Input Styling */
+.time-12h {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.t-input {
+    width: 48px;
+    padding: 10px 4px;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fcfcfc;
+}
+
+.t-input:focus {
+    border-color: var(--c-blue-border);
+    outline: none;
+    background: white;
+}
+
+.t-select {
+    width: 60px;
+    padding: 10px 4px;
+    /* Reduced padding */
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fcfcfc;
+    text-align: center;
+}
+
+.colon {
+    font-weight: bold;
+    color: #888;
+}
+
 .hidden {
     display: none !important;
 }

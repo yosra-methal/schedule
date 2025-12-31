@@ -264,6 +264,7 @@ function formatTimeRange(start, end) {
 }
 
 // Modal handling
+// Modal handling
 function renderColorOptions() {
     elements.form.colorContainer.innerHTML = '';
     CONFIG.colors.forEach(c => {
@@ -284,30 +285,100 @@ function renderColorOptions() {
     });
 }
 
+function updateTimeInputVisibility() {
+    const is24 = state.use24h;
+    document.querySelectorAll('.time-24h').forEach(el => el.classList.toggle('hidden', !is24));
+    document.querySelectorAll('.time-12h').forEach(el => el.classList.toggle('hidden', is24));
+}
+
+function setTimeInputs(startStr, endStr) {
+    if (state.use24h) {
+        document.getElementById('event-start').value = startStr;
+        document.getElementById('event-end').value = endStr;
+    } else {
+        // Parse 24h string to 12h components
+        const parse12 = (str) => {
+            let [h, m] = str.split(':').map(Number);
+            const suffix = h >= 12 ? 'PM' : 'AM';
+            h = h % 12 || 12;
+            return { h, m, suffix };
+        };
+
+        const s = parse12(startStr);
+        document.getElementById('start-h').value = s.h;
+        document.getElementById('start-m').value = s.m < 10 ? '0' + s.m : s.m;
+        document.getElementById('start-ampm').value = s.suffix;
+
+        const e = parse12(endStr);
+        document.getElementById('end-h').value = e.h;
+        document.getElementById('end-m').value = e.m < 10 ? '0' + e.m : e.m;
+        document.getElementById('end-ampm').value = e.suffix;
+    }
+}
+
+function getTimeInputValues() {
+    if (state.use24h) {
+        return {
+            start: document.getElementById('event-start').value,
+            end: document.getElementById('event-end').value
+        };
+    } else {
+        const get24 = (prefix) => {
+            let h = parseInt(document.getElementById(`${prefix}-h`).value, 10);
+            const m = parseInt(document.getElementById(`${prefix}-m`).value, 10);
+            const suffix = document.getElementById(`${prefix}-ampm`).value;
+
+            if (isNaN(h) || isNaN(m)) return ''; // Handle empty
+
+            if (suffix === 'PM' && h < 12) h += 12;
+            if (suffix === 'AM' && h === 12) h = 0;
+
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+        };
+
+        return {
+            start: get24('start'),
+            end: get24('end')
+        };
+    }
+}
+
 function openModal(existingEvent = null) {
     elements.modal.classList.remove('hidden');
-    // Trigger reflow for transition
     setTimeout(() => elements.modal.classList.add('visible'), 10);
+
+    updateTimeInputVisibility();
+
+    let startVal = '09:00';
+    let endVal = '10:00';
+    let dayVal = '0';
+    let titleVal = '';
 
     if (existingEvent) {
         currentEditingId = existingEvent.id;
         elements.modalTitle.textContent = 'Edit Entry';
-        elements.form.title.value = existingEvent.title;
-        elements.form.day.value = existingEvent.day;
-        elements.form.start.value = existingEvent.start;
-        elements.form.end.value = existingEvent.end;
+        titleVal = existingEvent.title;
+        dayVal = existingEvent.day;
+        startVal = existingEvent.start;
+        endVal = existingEvent.end;
         selectedColor = existingEvent.color;
         elements.btns.delete.classList.remove('hidden');
     } else {
         currentEditingId = null;
         elements.modalTitle.textContent = 'New Entry';
-        elements.form.title.value = '';
-        // Day/Time might be pre-filled by quick add, otherwise default
-        if (!elements.form.start.value) elements.form.start.value = '09:00';
-        if (!elements.form.end.value) elements.form.end.value = '10:00';
         selectedColor = CONFIG.colors[0].id;
         elements.btns.delete.classList.add('hidden');
+
+        // If quick add via grid click, values might be preset in form
+        // But we need to sync them to the UI mode
+        if (elements.form.start.value) startVal = elements.form.start.value;
+        if (elements.form.end.value) endVal = elements.form.end.value;
+        if (elements.form.day.value) dayVal = elements.form.day.value;
     }
+
+    elements.form.title.value = titleVal;
+    elements.form.day.value = dayVal;
+    setTimeInputs(startVal, endVal);
 
     // Update color selection UI
     document.querySelectorAll('.color-option').forEach(el => {
@@ -318,7 +389,6 @@ function openModal(existingEvent = null) {
 function closeModal() {
     elements.modal.classList.remove('visible');
     setTimeout(() => elements.modal.classList.add('hidden'), 200);
-    // Reset form mostly handled in open
 }
 
 function handleGridClick(e, dayIndex) {
@@ -337,10 +407,11 @@ function handleGridClick(e, dayIndex) {
     const mRounded = m < 30 ? 0 : 30;
 
     const startStr = `${h.toString().padStart(2, '0')}:${mRounded.toString().padStart(2, '0')}`;
-    // End logic: +1 hour
     const endH = h + 1;
     const endStr = `${endH.toString().padStart(2, '0')}:${mRounded.toString().padStart(2, '0')}`;
 
+    // Pre-set values in standard elements (or just pass to openModal via a temp object? 
+    // actually openModal reads them if currentEditingId is null)
     elements.form.day.value = dayIndex;
     elements.form.start.value = startStr;
     elements.form.end.value = endStr;
@@ -351,13 +422,20 @@ function handleGridClick(e, dayIndex) {
 function setupEventListeners() {
     elements.btns.cancel.addEventListener('click', closeModal);
     elements.btns.close.addEventListener('click', closeModal);
-    elements.btns.add.addEventListener('click', () => openModal());
+    elements.btns.add.addEventListener('click', () => {
+        // clear presets
+        elements.form.start.value = '09:00';
+        elements.form.end.value = '10:00';
+        openModal();
+    });
 
     elements.btns.save.addEventListener('click', () => {
         const title = elements.form.title.value;
         const day = parseInt(elements.form.day.value);
-        const start = elements.form.start.value;
-        const end = elements.form.end.value;
+
+        const times = getTimeInputValues();
+        const start = times.start;
+        const end = times.end;
         const color = selectedColor;
 
         if (!start || !end) return alert('Time is required');
@@ -403,13 +481,17 @@ function setupEventListeners() {
     });
 
     elements.toggle.addEventListener('change', (e) => {
-        state.use24h = !e.target.checked; // If checked, it means AM/PM mode usually or toggle right
-        // Label says 24h [toggle] AM/PM. 
-        // If unchecked (left) -> 24h.
-        // If checked (right) -> AM/PM.
-        // My init: checked = !state.use24h.
-        // So if use24h is true, checked is false. Correct.
-        saveData(); // saves pref
+        state.use24h = !e.target.checked;
+        saveData();
+        // If modal is open, we should probably update it? 
+        if (elements.modal.classList.contains('visible')) {
+            // Re-read current values, switch mode, re-set values
+            // bit complex, easiest is to just re-open or let user close/reopen
+            // But for UX:
+            const current = getTimeInputValues();
+            updateTimeInputVisibility();
+            setTimeInputs(current.start, current.end);
+        }
     });
 }
 
