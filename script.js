@@ -13,7 +13,7 @@ const CONFIG = {
         { id: 'blueberry',  bg: '#A0C4F8', border: '#6090D0' },
         { id: 'lavender',   bg: '#CDB8EA', border: '#9A88C8' },
         { id: 'grape',      bg: '#8E24AA', border: '#6B1880' },
-        { id: 'graphite',   bg: '#D0D0D0', border: '#A0A0A0' }
+        { id: 'graphite',   bg: '#EBEBEB', border: '#C0C0C0' }
     ]
 };
 
@@ -197,8 +197,6 @@ function renderGrid() {
             const duration = Math.round(oldEndH - oldStartH) || 1;
             const newEndH = Math.min(newStartH + duration, 24);
 
-            if (hasOverlap(dayIndex, newStartH, newEndH, eventId)) return;
-
             state.events[evIdx] = {
                 ...ev,
                 day: dayIndex,
@@ -211,8 +209,9 @@ function renderGrid() {
 
         // Render Events
         const dayEvents = state.events.filter(e => e.day == dayIndex);
+        const colMap = computeColumns(dayEvents);
         dayEvents.forEach(ev => {
-            const evEl = createEventElement(ev);
+            const evEl = createEventElement(ev, colMap.get(ev.id) || 0);
             body.appendChild(evEl);
         });
 
@@ -221,7 +220,7 @@ function renderGrid() {
     });
 }
 
-function createEventElement(ev) {
+function createEventElement(ev, colIndex = 0) {
     const el = document.createElement('div');
     el.className = `event-card ${ev.color}`;
 
@@ -234,9 +233,11 @@ function createEventElement(ev) {
     const top = (startH - state.viewStart) * CONFIG.slotHeight;
     const height = duration * CONFIG.slotHeight;
 
+    const CASCADE_PX = 12;
     el.style.top = `${top}px`;
     el.style.height = `${height}px`;
-    el.style.zIndex = Math.floor(startH * 60);
+    el.style.left = `${4 + colIndex * CASCADE_PX}px`;
+    el.style.zIndex = Math.floor(startH * 60) + colIndex;
 
     el.innerHTML = `
         <strong>${ev.title || 'Untitled'}</strong>
@@ -476,15 +477,31 @@ function closeModal() {
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
 }
 
-function hasOverlap(day, startH, endH, excludeId = null) {
-    return state.events.some(ev => {
-        if (excludeId && ev.id === excludeId) return false;
-        if (ev.day != day) return false;
+function computeColumns(dayEvents) {
+    const sorted = [...dayEvents].sort((a, b) => getDecimalHour(a.start) - getDecimalHour(b.start));
+    const colMap = new Map();
+
+    sorted.forEach(ev => {
         const evStart = getDecimalHour(ev.start);
         let evEnd = getDecimalHour(ev.end);
         if (evEnd === 0 && evStart > 0) evEnd = 24;
-        return !(endH <= evStart || startH >= evEnd);
+
+        const occupied = new Set();
+        colMap.forEach((col, id) => {
+            const other = dayEvents.find(e => e.id === id);
+            if (!other) return;
+            const oStart = getDecimalHour(other.start);
+            let oEnd = getDecimalHour(other.end);
+            if (oEnd === 0 && oStart > 0) oEnd = 24;
+            if (!(evEnd <= oStart || evStart >= oEnd)) occupied.add(col);
+        });
+
+        let col = 0;
+        while (occupied.has(col)) col++;
+        colMap.set(ev.id, col);
     });
+
+    return colMap;
 }
 
 function handleGridClick(e, dayIndex) {
@@ -568,17 +585,6 @@ function setupEventListeners() {
             });
             const errMsg = document.getElementById('time-error-msg');
             if (errMsg) { errMsg.textContent = 'The end time must be after the start time.'; errMsg.classList.remove('hidden'); }
-            return;
-        }
-
-        // Validation: no overlap
-        if (hasOverlap(day, startH, endH, currentEditingId)) {
-            ['start-h', 'start-m', 'end-h', 'end-m'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.classList.add('input-error');
-            });
-            const errMsg = document.getElementById('time-error-msg');
-            if (errMsg) { errMsg.textContent = 'This slot overlaps with an existing event.'; errMsg.classList.remove('hidden'); }
             return;
         }
 
