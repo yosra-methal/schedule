@@ -3,17 +3,17 @@ const CONFIG = {
     defaultStart: 8,
     defaultEnd: 18,
     colors: [
-        { id: 'tomato',     bg: '#F7CCCC', border: '#D50000' },
-        { id: 'flamingo',   bg: '#FAE5E3', border: '#E67C73' },
-        { id: 'tangerine',  bg: '#FDDCD2', border: '#F4511E' },
-        { id: 'banana',     bg: '#FDF2D4', border: '#F6BF26' },
-        { id: 'sage',       bg: '#D6F0E4', border: '#33B679' },
-        { id: 'basil',      bg: '#CFEBDE', border: '#0F9D58' },
-        { id: 'peacock',    bg: '#CDEBFA', border: '#039BE5' },
-        { id: 'blueberry',  bg: '#D9DCF0', border: '#3F51B5' },
-        { id: 'lavender',   bg: '#E4E7F5', border: '#7986CB' },
-        { id: 'grape',      bg: '#E8D3EE', border: '#8E24AA' },
-        { id: 'graphite',   bg: '#E0E0E0', border: '#616161' }
+        { id: 'tomato',     bg: '#D50000', border: '#AA0000' },
+        { id: 'flamingo',   bg: '#E67C73', border: '#C45A51' },
+        { id: 'tangerine',  bg: '#F4511E', border: '#CC3A0A' },
+        { id: 'banana',     bg: '#F6BF26', border: '#C89A0A' },
+        { id: 'sage',       bg: '#33B679', border: '#267D55' },
+        { id: 'basil',      bg: '#0F9D58', border: '#08703E' },
+        { id: 'peacock',    bg: '#039BE5', border: '#027AB5' },
+        { id: 'blueberry',  bg: '#3F51B5', border: '#2C3A8C' },
+        { id: 'lavender',   bg: '#7986CB', border: '#5A66B0' },
+        { id: 'grape',      bg: '#8E24AA', border: '#6B1880' },
+        { id: 'graphite',   bg: '#616161', border: '#404040' }
     ]
 };
 
@@ -53,7 +53,7 @@ const elements = {
 };
 
 let currentEditingId = null;
-let selectedColor = CONFIG.colors[0].id;
+let selectedColor = 'peacock';
 
 function updateBodyClass() {
     document.body.classList.toggle('ampm-mode', !state.use24h);
@@ -196,6 +196,8 @@ function renderGrid() {
             const oldEndH = getDecimalHour(ev.end);
             const duration = Math.round(oldEndH - oldStartH) || 1;
             const newEndH = Math.min(newStartH + duration, 24);
+
+            if (hasOverlap(dayIndex, newStartH, newEndH, eventId)) return;
 
             state.events[evIdx] = {
                 ...ev,
@@ -439,7 +441,7 @@ function openModal(existingEvent = null) {
     } else {
         currentEditingId = null;
         elements.modalTitle.textContent = 'New Entry';
-        selectedColor = CONFIG.colors[0].id;
+        selectedColor = 'peacock';
         elements.btns.delete.classList.add('hidden');
 
         // Use hidden inputs as transfer state from grid clicks
@@ -472,6 +474,17 @@ function closeModal() {
 
     // Clear validation errors
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+}
+
+function hasOverlap(day, startH, endH, excludeId = null) {
+    return state.events.some(ev => {
+        if (excludeId && ev.id === excludeId) return false;
+        if (ev.day != day) return false;
+        const evStart = getDecimalHour(ev.start);
+        let evEnd = getDecimalHour(ev.end);
+        if (evEnd === 0 && evStart > 0) evEnd = 24;
+        return !(endH <= evStart || startH >= evEnd);
+    });
 }
 
 function handleGridClick(e, dayIndex) {
@@ -547,19 +560,26 @@ function setupEventListeners() {
             endH = 24;
         }
 
-        // Silent Validation (Red Borders) - Only on Save
+        // Validation: end must be after start
         if (endH <= startH) {
-            // Highlight End Time Inputs
             ['end-h', 'end-m', 'end-ampm'].forEach(id => {
                 const el = document.getElementById(id);
                 if (el) el.classList.add('input-error');
             });
-
-            // Show error message
             const errMsg = document.getElementById('time-error-msg');
-            if (errMsg) errMsg.classList.remove('hidden');
+            if (errMsg) { errMsg.textContent = 'The end time must be after the start time.'; errMsg.classList.remove('hidden'); }
+            return;
+        }
 
-            return; // Stop save
+        // Validation: no overlap
+        if (hasOverlap(day, startH, endH, currentEditingId)) {
+            ['start-h', 'start-m', 'end-h', 'end-m'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('input-error');
+            });
+            const errMsg = document.getElementById('time-error-msg');
+            if (errMsg) { errMsg.textContent = 'This slot overlaps with an existing event.'; errMsg.classList.remove('hidden'); }
+            return;
         }
 
         // Clear any residual errors

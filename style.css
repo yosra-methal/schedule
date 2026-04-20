@@ -10,18 +10,18 @@
     --radius-card: 24px;
     --radius-label: 8px;
 
-    /* Google Calendar colors — light tint bg + full color left border */
-    --c-tomato-bg: #F7CCCC;       --c-tomato-border: #D50000;
-    --c-flamingo-bg: #FAE5E3;     --c-flamingo-border: #E67C73;
-    --c-tangerine-bg: #FDDCD2;    --c-tangerine-border: #F4511E;
-    --c-banana-bg: #FDF2D4;       --c-banana-border: #F6BF26;
-    --c-sage-bg: #D6F0E4;         --c-sage-border: #33B679;
-    --c-basil-bg: #CFEBDE;        --c-basil-border: #0F9D58;
-    --c-peacock-bg: #CDEBFA;      --c-peacock-border: #039BE5;
-    --c-blueberry-bg: #D9DCF0;    --c-blueberry-border: #3F51B5;
-    --c-lavender-bg: #E4E7F5;     --c-lavender-border: #7986CB;
-    --c-grape-bg: #E8D3EE;        --c-grape-border: #8E24AA;
-    --c-graphite-bg: #E0E0E0;     --c-graphite-border: #616161;
+    /* Google Calendar exact colors as event backgrounds */
+    --c-tomato-bg: #D50000;       --c-tomato-border: #AA0000;
+    --c-flamingo-bg: #E67C73;     --c-flamingo-border: #C45A51;
+    --c-tangerine-bg: #F4511E;    --c-tangerine-border: #CC3A0A;
+    --c-banana-bg: #F6BF26;       --c-banana-border: #C89A0A;
+    --c-sage-bg: #33B679;         --c-sage-border: #267D55;
+    --c-basil-bg: #0F9D58;        --c-basil-border: #08703E;
+    --c-peacock-bg: #039BE5;      --c-peacock-border: #027AB5;
+    --c-blueberry-bg: #3F51B5;    --c-blueberry-border: #2C3A8C;
+    --c-lavender-bg: #7986CB;     --c-lavender-border: #5A66B0;
+    --c-grape-bg: #8E24AA;        --c-grape-border: #6B1880;
+    --c-graphite-bg: #616161;     --c-graphite-border: #404040;
 
     --slot-height: 60px;
     /* 1 hour height */
@@ -465,7 +465,7 @@ input:checked+.slider:before {
 
 .form-group input:focus,
 .form-group select:focus {
-    border-color: var(--c-blue-border);
+    border-color: var(--c-peacock-border);
     outline: none;
     background: white;
 }
@@ -583,7 +583,7 @@ input:checked+.slider:before {
 }
 
 .t-input:focus {
-    border-color: var(--c-blue-border);
+    border-color: var(--c-peacock-border);
     outline: none;
     background: white;
 }
@@ -605,7 +605,7 @@ input:checked+.slider:before {
 }
 
 .t-select:focus {
-    border-color: var(--c-blue-border);
+    border-color: var(--c-peacock-border);
     outline: none;
     background: white;
 }
