@@ -3,17 +3,17 @@ const CONFIG = {
     defaultStart: 8,
     defaultEnd: 18,
     colors: [
-        { id: 'tomato',     bg: '#D50000', border: '#AA0000' },
-        { id: 'flamingo',   bg: '#E67C73', border: '#C45A51' },
-        { id: 'tangerine',  bg: '#F4511E', border: '#CC3A0A' },
-        { id: 'banana',     bg: '#F6BF26', border: '#C89A0A' },
-        { id: 'sage',       bg: '#33B679', border: '#267D55' },
-        { id: 'basil',      bg: '#0F9D58', border: '#08703E' },
-        { id: 'peacock',    bg: '#039BE5', border: '#027AB5' },
-        { id: 'blueberry',  bg: '#3F51B5', border: '#2C3A8C' },
-        { id: 'lavender',   bg: '#7986CB', border: '#5A66B0' },
+        { id: 'tomato',     bg: '#F4AAAA', border: '#D07070' },
+        { id: 'flamingo',   bg: '#F9C9C6', border: '#D8A0A0' },
+        { id: 'tangerine',  bg: '#FAC9A8', border: '#D89070' },
+        { id: 'banana',     bg: '#FBE9A0', border: '#D8C060' },
+        { id: 'sage',       bg: '#A8DCC0', border: '#70B898' },
+        { id: 'basil',      bg: '#A3D4B0', border: '#6AB088' },
+        { id: 'peacock',    bg: '#A8DCF0', border: '#60B8D8' },
+        { id: 'blueberry',  bg: '#B0B8E8', border: '#7880C8' },
+        { id: 'lavender',   bg: '#C5CAE9', border: '#8890C8' },
         { id: 'grape',      bg: '#8E24AA', border: '#6B1880' },
-        { id: 'graphite',   bg: '#616161', border: '#404040' }
+        { id: 'graphite',   bg: '#D0D0D0', border: '#A0A0A0' }
     ]
 };
 

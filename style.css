@@ -10,18 +10,18 @@
     --radius-card: 24px;
     --radius-label: 8px;
 
-    /* Google Calendar exact colors as event backgrounds */
-    --c-tomato-bg: #D50000;       --c-tomato-border: #AA0000;
-    --c-flamingo-bg: #E67C73;     --c-flamingo-border: #C45A51;
-    --c-tangerine-bg: #F4511E;    --c-tangerine-border: #CC3A0A;
-    --c-banana-bg: #F6BF26;       --c-banana-border: #C89A0A;
-    --c-sage-bg: #33B679;         --c-sage-border: #267D55;
-    --c-basil-bg: #0F9D58;        --c-basil-border: #08703E;
-    --c-peacock-bg: #039BE5;      --c-peacock-border: #027AB5;
-    --c-blueberry-bg: #3F51B5;    --c-blueberry-border: #2C3A8C;
-    --c-lavender-bg: #7986CB;     --c-lavender-border: #5A66B0;
+    /* Pastel Google Calendar colors (Grape stays original) */
+    --c-tomato-bg: #F4AAAA;       --c-tomato-border: #D07070;
+    --c-flamingo-bg: #F9C9C6;     --c-flamingo-border: #D8A0A0;
+    --c-tangerine-bg: #FAC9A8;    --c-tangerine-border: #D89070;
+    --c-banana-bg: #FBE9A0;       --c-banana-border: #D8C060;
+    --c-sage-bg: #A8DCC0;         --c-sage-border: #70B898;
+    --c-basil-bg: #A3D4B0;        --c-basil-border: #6AB088;
+    --c-peacock-bg: #A8DCF0;      --c-peacock-border: #60B8D8;
+    --c-blueberry-bg: #B0B8E8;    --c-blueberry-border: #7880C8;
+    --c-lavender-bg: #C5CAE9;     --c-lavender-border: #8890C8;
     --c-grape-bg: #8E24AA;        --c-grape-border: #6B1880;
-    --c-graphite-bg: #616161;     --c-graphite-border: #404040;
+    --c-graphite-bg: #D0D0D0;     --c-graphite-border: #A0A0A0;
 
     --slot-height: 60px;
     /* 1 hour height */
@@ -366,7 +366,7 @@ input:checked+.slider:before {
 .event-card.peacock    { background: var(--c-peacock-bg);    border-left: 4px solid var(--c-peacock-border); }
 .event-card.blueberry  { background: var(--c-blueberry-bg);  border-left: 4px solid var(--c-blueberry-border); }
 .event-card.lavender   { background: var(--c-lavender-bg);   border-left: 4px solid var(--c-lavender-border); }
-.event-card.grape      { background: var(--c-grape-bg);      border-left: 4px solid var(--c-grape-border); }
+.event-card.grape      { background: var(--c-grape-bg);      border-left: 4px solid var(--c-grape-border); color: #FFFFFF; }
 .event-card.graphite   { background: var(--c-graphite-bg);   border-left: 4px solid var(--c-graphite-border); }
 
 .event-card.dragging {
