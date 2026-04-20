@@ -12,7 +12,7 @@ const CONFIG = {
         { id: 'peacock',    bg: '#A8DCF0', border: '#60B8D8' },
         { id: 'blueberry',  bg: '#A0C4F8', border: '#6090D0' },
         { id: 'lavender',   bg: '#CDB8EA', border: '#9A88C8' },
-        { id: 'grape',      bg: '#8E24AA', border: '#6B1880' },
+        { id: 'grape',      bg: '#CE9FDC', border: '#A060B8' },
         { id: 'graphite',   bg: '#EBEBEB', border: '#C0C0C0' }
     ]
 };
