@@ -10,23 +10,18 @@
     --radius-card: 24px;
     --radius-label: 8px;
 
-    /* Colors */
-    --c-blue-bg: #E1F5FE;
-    --c-blue-border: #0288D1;
-    --c-green-bg: #D4EDE5;
-    --c-green-border: #A8D5C2;
-    --c-rose-bg: #FAE0EB;
-    --c-rose-border: #F2B5C8;
-    --c-purple-bg: #6B6BB5;
-    --c-purple-border: #4A4A8F;
-    --c-orange-bg: #FDE8DC;
-    --c-orange-border: #F4A47C;
-    --c-yellow-bg: #FDF5D1;
-    --c-yellow-border: #F9D976;
-    --c-red-bg: #E8716A;
-    --c-red-border: #C04040;
-    --c-grey-bg: #F5EFE4;
-    --c-grey-border: #E8DCC8;
+    /* Google Calendar colors — light tint bg + full color left border */
+    --c-tomato-bg: #F7CCCC;       --c-tomato-border: #D50000;
+    --c-flamingo-bg: #FAE5E3;     --c-flamingo-border: #E67C73;
+    --c-tangerine-bg: #FDDCD2;    --c-tangerine-border: #F4511E;
+    --c-banana-bg: #FDF2D4;       --c-banana-border: #F6BF26;
+    --c-sage-bg: #D6F0E4;         --c-sage-border: #33B679;
+    --c-basil-bg: #CFEBDE;        --c-basil-border: #0F9D58;
+    --c-peacock-bg: #CDEBFA;      --c-peacock-border: #039BE5;
+    --c-blueberry-bg: #D9DCF0;    --c-blueberry-border: #3F51B5;
+    --c-lavender-bg: #E4E7F5;     --c-lavender-border: #7986CB;
+    --c-grape-bg: #E8D3EE;        --c-grape-border: #8E24AA;
+    --c-graphite-bg: #E0E0E0;     --c-graphite-border: #616161;
 
     --slot-height: 60px;
     /* 1 hour height */
@@ -325,7 +320,7 @@ input:checked+.slider:before {
     border-radius: var(--radius-label);
     font-size: 12px;
     font-weight: 600;
-    color: #2D2D2D;
+    color: #000000;
     overflow: hidden;
     cursor: pointer;
     transition: transform 0.1s ease, box-shadow 0.1s ease;
@@ -362,47 +357,17 @@ input:checked+.slider:before {
     z-index: 1500 !important;
 }
 
-.event-card.blue {
-    background: var(--c-blue-bg);
-    border-left: 4px solid var(--c-blue-border);
-}
-
-.event-card.green {
-    background: var(--c-green-bg);
-    border-left: 4px solid var(--c-green-border);
-}
-
-.event-card.rose {
-    background: var(--c-rose-bg);
-    border-left: 4px solid var(--c-rose-border);
-}
-
-.event-card.purple {
-    background: var(--c-purple-bg);
-    border-left: 4px solid var(--c-purple-border);
-    color: #FFFFFF;
-}
-
-.event-card.orange {
-    background: var(--c-orange-bg);
-    border-left: 4px solid var(--c-orange-border);
-}
-
-.event-card.yellow {
-    background: var(--c-yellow-bg);
-    border-left: 4px solid var(--c-yellow-border);
-}
-
-.event-card.red {
-    background: var(--c-red-bg);
-    border-left: 4px solid var(--c-red-border);
-    color: #FFFFFF;
-}
-
-.event-card.grey {
-    background: var(--c-grey-bg);
-    border-left: 4px solid var(--c-grey-border);
-}
+.event-card.tomato     { background: var(--c-tomato-bg);     border-left: 4px solid var(--c-tomato-border); }
+.event-card.flamingo   { background: var(--c-flamingo-bg);   border-left: 4px solid var(--c-flamingo-border); }
+.event-card.tangerine  { background: var(--c-tangerine-bg);  border-left: 4px solid var(--c-tangerine-border); }
+.event-card.banana     { background: var(--c-banana-bg);     border-left: 4px solid var(--c-banana-border); }
+.event-card.sage       { background: var(--c-sage-bg);       border-left: 4px solid var(--c-sage-border); }
+.event-card.basil      { background: var(--c-basil-bg);      border-left: 4px solid var(--c-basil-border); }
+.event-card.peacock    { background: var(--c-peacock-bg);    border-left: 4px solid var(--c-peacock-border); }
+.event-card.blueberry  { background: var(--c-blueberry-bg);  border-left: 4px solid var(--c-blueberry-border); }
+.event-card.lavender   { background: var(--c-lavender-bg);   border-left: 4px solid var(--c-lavender-border); }
+.event-card.grape      { background: var(--c-grape-bg);      border-left: 4px solid var(--c-grape-border); }
+.event-card.graphite   { background: var(--c-graphite-bg);   border-left: 4px solid var(--c-graphite-border); }
 
 .event-card.dragging {
     opacity: 0.5;
