@@ -11,15 +11,15 @@
     --radius-label: 8px;
 
     /* Pastel Google Calendar colors (Grape stays original) */
-    --c-tomato-bg: #F4AAAA;       --c-tomato-border: #D07070;
-    --c-flamingo-bg: #F9C9C6;     --c-flamingo-border: #D8A0A0;
+    --c-tomato-bg: #F28B82;       --c-tomato-border: #C06060;
+    --c-flamingo-bg: #FCC4DE;     --c-flamingo-border: #D898B8;
     --c-tangerine-bg: #FAC9A8;    --c-tangerine-border: #D89070;
     --c-banana-bg: #FBE9A0;       --c-banana-border: #D8C060;
     --c-sage-bg: #A8DCC0;         --c-sage-border: #70B898;
-    --c-basil-bg: #A3D4B0;        --c-basil-border: #6AB088;
+    --c-basil-bg: #68C096;        --c-basil-border: #409870;
     --c-peacock-bg: #A8DCF0;      --c-peacock-border: #60B8D8;
-    --c-blueberry-bg: #B0B8E8;    --c-blueberry-border: #7880C8;
-    --c-lavender-bg: #C5CAE9;     --c-lavender-border: #8890C8;
+    --c-blueberry-bg: #A0C4F8;    --c-blueberry-border: #6090D0;
+    --c-lavender-bg: #CDB8EA;     --c-lavender-border: #9A88C8;
     --c-grape-bg: #8E24AA;        --c-grape-border: #6B1880;
     --c-graphite-bg: #D0D0D0;     --c-graphite-border: #A0A0A0;
 
