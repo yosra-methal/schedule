@@ -3,12 +3,14 @@ const CONFIG = {
     defaultStart: 8,
     defaultEnd: 18,
     colors: [
-        { id: 'blue', bg: '#E1F5FE', border: '#0288D1' },
-        { id: 'green', bg: '#E8F5E9', border: '#388E3C' },
-        { id: 'rose', bg: '#FCE4EC', border: '#D81B60' },
-        { id: 'purple', bg: '#F3E5F5', border: '#7B1FA2' },
-        { id: 'orange', bg: '#FFF0EB', border: '#FF8B66' },
-        { id: 'grey', bg: '#F5F5F5', border: '#616161' }
+        { id: 'blue',   bg: '#E1F5FE', border: '#0288D1' },
+        { id: 'green',  bg: '#D4EDE5', border: '#A8D5C2' },
+        { id: 'rose',   bg: '#FAE0EB', border: '#F2B5C8' },
+        { id: 'orange', bg: '#FDE8DC', border: '#F4A47C' },
+        { id: 'yellow', bg: '#FDF5D1', border: '#F9D976' },
+        { id: 'purple', bg: '#6B6BB5', border: '#4A4A8F' },
+        { id: 'red',    bg: '#E8716A', border: '#C04040' },
+        { id: 'grey',   bg: '#F5EFE4', border: '#E8DCC8' }
     ]
 };
 
@@ -50,6 +52,10 @@ const elements = {
 let currentEditingId = null;
 let selectedColor = CONFIG.colors[0].id;
 
+function updateBodyClass() {
+    document.body.classList.toggle('ampm-mode', !state.use24h);
+}
+
 // Initialization
 function init() {
     loadData();
@@ -58,8 +64,8 @@ function init() {
     renderGrid();
     setupEventListeners();
 
-    // Set toggle state
     elements.toggle.checked = !state.use24h;
+    updateBodyClass();
 }
 
 function loadData() {
@@ -155,6 +161,49 @@ function renderGrid() {
         // Click handler for creating events
         body.addEventListener('click', (e) => handleGridClick(e, dayIndex));
 
+        // Drag-to-reschedule handlers
+        body.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            body.classList.add('drag-over');
+        });
+
+        body.addEventListener('dragleave', () => {
+            body.classList.remove('drag-over');
+        });
+
+        body.addEventListener('drop', (e) => {
+            e.preventDefault();
+            body.classList.remove('drag-over');
+            const eventId = e.dataTransfer.getData('eventId');
+            if (!eventId) return;
+
+            const grabOffsetY = parseFloat(e.dataTransfer.getData('grabOffsetY')) || 0;
+            const rect = body.getBoundingClientRect();
+            const offsetY = e.clientY - rect.top - grabOffsetY;
+            const droppedH = state.viewStart + (offsetY / CONFIG.slotHeight);
+
+            const newStartH = Math.max(state.viewStart, Math.min(Math.round(droppedH), state.viewEnd - 1));
+
+            const evIdx = state.events.findIndex(ev => ev.id === eventId);
+            if (evIdx === -1) return;
+
+            const ev = state.events[evIdx];
+            const oldStartH = getDecimalHour(ev.start);
+            const oldEndH = getDecimalHour(ev.end);
+            const duration = Math.round(oldEndH - oldStartH) || 1;
+            const newEndH = Math.min(newStartH + duration, 24);
+
+            state.events[evIdx] = {
+                ...ev,
+                day: dayIndex,
+                start: `${newStartH.toString().padStart(2, '0')}:00`,
+                end: `${newEndH.toString().padStart(2, '0')}:00`
+            };
+
+            saveData();
+        });
+
         // Render Events
         const dayEvents = state.events.filter(e => e.day == dayIndex);
         dayEvents.forEach(ev => {
@@ -177,25 +226,39 @@ function createEventElement(ev) {
 
     const duration = endH - startH;
 
-    // Top relative to viewStart
     const top = (startH - state.viewStart) * CONFIG.slotHeight;
     const height = duration * CONFIG.slotHeight;
 
     el.style.top = `${top}px`;
     el.style.height = `${height}px`;
-    // Stacking: Later events on top
     el.style.zIndex = Math.floor(startH * 60);
 
-    // Content
     el.innerHTML = `
         <strong>${ev.title || 'Untitled'}</strong>
-        <span style="font-weight: 400; font-size: 11px; margin-top: 2px;">
-            ${formatTimeRange(ev.start, ev.end)}
-        </span>
+        <span class="event-time">${formatTimeRange(ev.start, ev.end)}</span>
     `;
 
+    el.draggable = true;
+
+    el.addEventListener('dragstart', (e) => {
+        e.stopPropagation();
+        const rect = el.getBoundingClientRect();
+        const grabOffsetY = e.clientY - rect.top;
+        e.dataTransfer.setData('eventId', ev.id);
+        e.dataTransfer.setData('grabOffsetY', grabOffsetY.toString());
+        e.dataTransfer.effectAllowed = 'move';
+        el.classList.add('dragging');
+    });
+
+    el.addEventListener('dragend', () => {
+        el.classList.remove('dragging');
+    });
+
+    let didDrag = false;
+    el.addEventListener('dragstart', () => { didDrag = true; });
     el.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (didDrag) { didDrag = false; return; }
         openModal(ev);
     });
 
@@ -409,21 +472,19 @@ function closeModal() {
 }
 
 function handleGridClick(e, dayIndex) {
-    if (e.target.classList.contains('event-card')) return;
+    if (e.target.closest('.event-card')) return;
 
     const rect = e.currentTarget.getBoundingClientRect();
     const offsetY = e.clientY - rect.top;
     const clickedH = state.viewStart + (offsetY / CONFIG.slotHeight);
 
-    const h = Math.floor(clickedH);
-    const m = Math.floor((clickedH - h) * 60);
-    const mRounded = m < 30 ? 0 : 30;
+    // Snap to nearest full hour
+    const h = Math.round(clickedH);
+    const clampedH = Math.max(state.viewStart, Math.min(h, state.viewEnd - 1));
 
-    const startStr = `${h.toString().padStart(2, '0')}:${mRounded.toString().padStart(2, '0')}`;
-    const endH = h + 1;
-    const endStr = `${endH.toString().padStart(2, '0')}:${mRounded.toString().padStart(2, '0')}`;
+    const startStr = `${clampedH.toString().padStart(2, '0')}:00`;
+    const endStr = `${(clampedH + 1).toString().padStart(2, '0')}:00`;
 
-    // Set transfer state
     const hideStart = document.getElementById('event-start');
     const hideEnd = document.getElementById('event-end');
     if (hideStart) hideStart.value = startStr;
@@ -542,6 +603,7 @@ function setupEventListeners() {
         }
 
         state.use24h = !e.target.checked;
+        updateBodyClass();
         saveData();
 
         if (elements.modal.classList.contains('visible')) {
