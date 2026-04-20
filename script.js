@@ -209,9 +209,9 @@ function renderGrid() {
 
         // Render Events
         const dayEvents = state.events.filter(e => e.day == dayIndex);
-        const colMap = computeColumns(dayEvents);
+        const { colMap, numColsMap } = computeLayout(dayEvents);
         dayEvents.forEach(ev => {
-            const evEl = createEventElement(ev, colMap.get(ev.id) || 0);
+            const evEl = createEventElement(ev, colMap.get(ev.id) || 0, numColsMap.get(ev.id) || 1);
             body.appendChild(evEl);
         });
 
@@ -220,7 +220,7 @@ function renderGrid() {
     });
 }
 
-function createEventElement(ev, colIndex = 0) {
+function createEventElement(ev, colIndex = 0, numCols = 1) {
     const el = document.createElement('div');
     el.className = `event-card ${ev.color}`;
 
@@ -233,11 +233,20 @@ function createEventElement(ev, colIndex = 0) {
     const top = (startH - state.viewStart) * CONFIG.slotHeight;
     const height = duration * CONFIG.slotHeight;
 
-    const CASCADE_PX = 12;
     el.style.top = `${top}px`;
     el.style.height = `${height}px`;
-    el.style.left = `${4 + colIndex * CASCADE_PX}px`;
     el.style.zIndex = Math.floor(startH * 60) + colIndex;
+
+    if (numCols <= 1) {
+        el.style.left = '4px';
+        el.style.right = '4px';
+    } else {
+        const GAP = 2; // px between adjacent events
+        const leftPct  = (colIndex / numCols * 100).toFixed(3);
+        const rightPct = ((numCols - colIndex - 1) / numCols * 100).toFixed(3);
+        el.style.left  = `calc(${leftPct}% + ${colIndex === 0 ? 4 : GAP}px)`;
+        el.style.right = `calc(${rightPct}% + ${colIndex === numCols - 1 ? 4 : GAP}px)`;
+    }
 
     el.innerHTML = `
         <strong>${ev.title || 'Untitled'}</strong>
@@ -477,31 +486,45 @@ function closeModal() {
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
 }
 
-function computeColumns(dayEvents) {
+function overlaps(a, b) {
+    const aStart = getDecimalHour(a.start);
+    let aEnd = getDecimalHour(a.end);
+    if (aEnd === 0 && aStart > 0) aEnd = 24;
+    const bStart = getDecimalHour(b.start);
+    let bEnd = getDecimalHour(b.end);
+    if (bEnd === 0 && bStart > 0) bEnd = 24;
+    return !(aEnd <= bStart || aStart >= bEnd);
+}
+
+function computeLayout(dayEvents) {
     const sorted = [...dayEvents].sort((a, b) => getDecimalHour(a.start) - getDecimalHour(b.start));
     const colMap = new Map();
 
+    // Step 1: greedy column index assignment
     sorted.forEach(ev => {
-        const evStart = getDecimalHour(ev.start);
-        let evEnd = getDecimalHour(ev.end);
-        if (evEnd === 0 && evStart > 0) evEnd = 24;
-
         const occupied = new Set();
         colMap.forEach((col, id) => {
             const other = dayEvents.find(e => e.id === id);
-            if (!other) return;
-            const oStart = getDecimalHour(other.start);
-            let oEnd = getDecimalHour(other.end);
-            if (oEnd === 0 && oStart > 0) oEnd = 24;
-            if (!(evEnd <= oStart || evStart >= oEnd)) occupied.add(col);
+            if (other && overlaps(ev, other)) occupied.add(col);
         });
-
         let col = 0;
         while (occupied.has(col)) col++;
         colMap.set(ev.id, col);
     });
 
-    return colMap;
+    // Step 2: for each event, numCols = highest column index in its overlap group + 1
+    const numColsMap = new Map();
+    dayEvents.forEach(ev => {
+        let maxCol = colMap.get(ev.id);
+        dayEvents.forEach(other => {
+            if (other.id !== ev.id && overlaps(ev, other)) {
+                maxCol = Math.max(maxCol, colMap.get(other.id));
+            }
+        });
+        numColsMap.set(ev.id, maxCol + 1);
+    });
+
+    return { colMap, numColsMap };
 }
 
 function handleGridClick(e, dayIndex) {
