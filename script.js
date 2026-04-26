@@ -55,6 +55,7 @@ const elements = {
 
 let currentEditingId = null;
 let selectedColor = 'peacock';
+let isDuplicating = false;
 
 function updateBodyClass() {
     document.body.classList.toggle('ampm-mode', !state.use24h);
@@ -488,7 +489,13 @@ function closeModal() {
     // Clear validation errors and duplicate state
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
     document.getElementById('duplicate-hint').classList.add('hidden');
-    document.getElementById('event-day').classList.remove('day-highlight');
+    isDuplicating = false;
+    document.getElementById('day-single-row').classList.remove('hidden');
+    document.getElementById('day-multi-row').classList.add('hidden');
+    document.getElementById('multi-day-options').classList.add('hidden');
+    document.querySelectorAll('#multi-day-options input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.getElementById('multi-day-display').textContent = 'Select days…';
+    document.getElementById('day-chip-error').classList.add('hidden');
 }
 
 function overlaps(a, b) {
@@ -619,6 +626,23 @@ function setupEventListeners() {
         // Clear any residual errors
         document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
 
+        if (isDuplicating) {
+            const checked = [...document.querySelectorAll('#multi-day-options input[type="checkbox"]:checked')];
+            if (checked.length === 0) {
+                document.getElementById('day-chip-error').classList.remove('hidden');
+                return;
+            }
+            checked.forEach((cb, i) => {
+                state.events.push({
+                    id: `${Date.now()}-${i}`,
+                    title, day: parseInt(cb.value), start, end, color
+                });
+            });
+            saveData();
+            closeModal();
+            return;
+        }
+
         if (currentEditingId) {
             // Update
             const idx = state.events.findIndex(e => e.id === currentEditingId);
@@ -641,12 +665,39 @@ function setupEventListeners() {
     elements.btns.duplicate.addEventListener('click', () => {
         if (!currentEditingId) return;
         currentEditingId = null;
+        isDuplicating = true;
         elements.modalTitle.textContent = 'Duplicate Entry';
         elements.btns.delete.classList.add('hidden');
         elements.btns.duplicate.classList.add('hidden');
         document.getElementById('duplicate-hint').classList.remove('hidden');
-        document.getElementById('event-day').classList.add('day-highlight');
-        document.getElementById('event-day').focus();
+        document.getElementById('day-single-row').classList.add('hidden');
+        document.getElementById('day-multi-row').classList.remove('hidden');
+        document.getElementById('multi-day-trigger').focus();
+    });
+
+    // Multi-day dropdown toggle
+    document.getElementById('multi-day-trigger').addEventListener('click', () => {
+        document.getElementById('multi-day-options').classList.toggle('hidden');
+    });
+
+    // Update trigger label when checkboxes change
+    document.querySelectorAll('#multi-day-options input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', () => {
+            const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const checked = [...document.querySelectorAll('#multi-day-options input:checked')]
+                .map(c => days[parseInt(c.value)]);
+            document.getElementById('multi-day-display').textContent =
+                checked.length ? checked.join(', ') : 'Select days…';
+            document.getElementById('day-chip-error').classList.add('hidden');
+        });
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const select = document.getElementById('multi-day-select');
+        if (select && !select.contains(e.target)) {
+            document.getElementById('multi-day-options').classList.add('hidden');
+        }
     });
 
     elements.btns.delete.addEventListener('click', () => {

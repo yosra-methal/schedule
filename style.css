@@ -629,10 +629,73 @@ input:checked+.slider:before {
     margin-bottom: 16px;
 }
 
-#event-day.day-highlight {
-    border-color: #039BE5;
-    box-shadow: 0 0 0 3px rgba(3, 155, 229, 0.2);
+.multi-day-select {
+    position: relative;
+    width: 100%;
+}
+
+.multi-day-trigger {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fcfcfc;
+    color: #333;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-align: left;
+    transition: border-color 0.2s;
+}
+
+.multi-day-trigger:focus {
+    border-color: var(--c-peacock-border);
+    outline: none;
     background: white;
+}
+
+.multi-day-arrow {
+    color: #aaa;
+    font-size: 12px;
+}
+
+.multi-day-options {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 200;
+    padding: 4px 0;
+}
+
+.multi-day-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    user-select: none;
+}
+
+.multi-day-option:hover {
+    background: #f5f5f5;
+}
+
+.multi-day-option input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: #039BE5;
+    cursor: pointer;
+    flex-shrink: 0;
 }
 
 .input-error {

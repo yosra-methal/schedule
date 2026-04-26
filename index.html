@@ -47,14 +47,14 @@
             </div>
             <div class="modal-body">
                 <div id="duplicate-hint" class="duplicate-hint hidden">
-                    📋 Select the destination day below, then click <strong>Save</strong>.
+                    📋 Select one or more days below, then click <strong>Save</strong>.
                 </div>
                 <div class="form-group">
                     <label for="event-title">Title</label>
                     <input type="text" id="event-title" autocapitalize="words">
                 </div>
 
-                <div class="form-row">
+                <div class="form-row" id="day-single-row">
                     <div class="form-group">
                         <label for="event-day">Day</label>
                         <select id="event-day">
@@ -67,6 +67,26 @@
                             <option value="6">Sunday</option>
                         </select>
                     </div>
+                </div>
+
+                <div id="day-multi-row" class="form-group hidden">
+                    <label>Duplicate to</label>
+                    <div class="multi-day-select" id="multi-day-select">
+                        <button type="button" class="multi-day-trigger" id="multi-day-trigger">
+                            <span id="multi-day-display">Select days…</span>
+                            <span class="multi-day-arrow">▾</span>
+                        </button>
+                        <div class="multi-day-options hidden" id="multi-day-options">
+                            <label class="multi-day-option"><input type="checkbox" value="0"> Monday</label>
+                            <label class="multi-day-option"><input type="checkbox" value="1"> Tuesday</label>
+                            <label class="multi-day-option"><input type="checkbox" value="2"> Wednesday</label>
+                            <label class="multi-day-option"><input type="checkbox" value="3"> Thursday</label>
+                            <label class="multi-day-option"><input type="checkbox" value="4"> Friday</label>
+                            <label class="multi-day-option"><input type="checkbox" value="5"> Saturday</label>
+                            <label class="multi-day-option"><input type="checkbox" value="6"> Sunday</label>
+                        </div>
+                    </div>
+                    <div id="day-chip-error" class="error-text hidden">Please select at least one day.</div>
                 </div>
 
                 <div class="form-row">
