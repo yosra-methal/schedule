@@ -619,6 +619,22 @@ input:checked+.slider:before {
     display: none !important;
 }
 
+.duplicate-hint {
+    background: #EEF6FF;
+    border: 1px solid #B8D9F8;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: #1A6BB5;
+    margin-bottom: 16px;
+}
+
+#event-day.day-highlight {
+    border-color: #039BE5;
+    box-shadow: 0 0 0 3px rgba(3, 155, 229, 0.2);
+    background: white;
+}
+
 .input-error {
     border: 1px solid #FF3B30 !important;
     box-shadow: 0 0 0 1px #FF3B30 !important;

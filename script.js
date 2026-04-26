@@ -485,8 +485,10 @@ function closeModal() {
     if (hideStart) hideStart.value = '';
     if (hideEnd) hideEnd.value = '';
 
-    // Clear validation errors
+    // Clear validation errors and duplicate state
     document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+    document.getElementById('duplicate-hint').classList.add('hidden');
+    document.getElementById('event-day').classList.remove('day-highlight');
 }
 
 function overlaps(a, b) {
@@ -638,11 +640,13 @@ function setupEventListeners() {
 
     elements.btns.duplicate.addEventListener('click', () => {
         if (!currentEditingId) return;
-        // Switch to create-new mode; keep all form values so user only needs to change the day
         currentEditingId = null;
-        elements.modalTitle.textContent = 'Duplicate Entry — choose a day';
+        elements.modalTitle.textContent = 'Duplicate Entry';
         elements.btns.delete.classList.add('hidden');
         elements.btns.duplicate.classList.add('hidden');
+        document.getElementById('duplicate-hint').classList.remove('hidden');
+        document.getElementById('event-day').classList.add('day-highlight');
+        document.getElementById('event-day').focus();
     });
 
     elements.btns.delete.addEventListener('click', () => {
