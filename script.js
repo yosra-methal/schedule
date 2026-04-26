@@ -46,6 +46,7 @@ const elements = {
         save: document.getElementById('save-btn'),
         cancel: document.getElementById('cancel-btn'),
         delete: document.getElementById('delete-btn'),
+        duplicate: document.getElementById('duplicate-btn'),
         close: document.getElementById('close-modal'),
         add: document.getElementById('add-event-btn')
     },
@@ -448,11 +449,13 @@ function openModal(existingEvent = null) {
         endVal = existingEvent.end;
         selectedColor = existingEvent.color;
         elements.btns.delete.classList.remove('hidden');
+        elements.btns.duplicate.classList.remove('hidden');
     } else {
         currentEditingId = null;
         elements.modalTitle.textContent = 'New Entry';
         selectedColor = 'peacock';
         elements.btns.delete.classList.add('hidden');
+        elements.btns.duplicate.classList.add('hidden');
 
         // Use hidden inputs as transfer state from grid clicks
         const hideStart = document.getElementById('event-start');
@@ -631,6 +634,15 @@ function setupEventListeners() {
 
         saveData();
         closeModal();
+    });
+
+    elements.btns.duplicate.addEventListener('click', () => {
+        if (!currentEditingId) return;
+        // Switch to create-new mode; keep all form values so user only needs to change the day
+        currentEditingId = null;
+        elements.modalTitle.textContent = 'Duplicate Entry — choose a day';
+        elements.btns.delete.classList.add('hidden');
+        elements.btns.duplicate.classList.add('hidden');
     });
 
     elements.btns.delete.addEventListener('click', () => {
